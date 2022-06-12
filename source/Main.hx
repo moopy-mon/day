@@ -135,7 +135,7 @@ class Main extends Sprite
 			dateNow = StringTools.replace(dateNow, " ", "_");
 			dateNow = StringTools.replace(dateNow, ":", "'");
 	
-			path = "./crash/" + "LoreEngine_" + dateNow + ".txt";
+			path = "./crash/" + "MoopyMonday_" + dateNow + ".txt";
 	
 			for (stackItem in callStack)
 			{
@@ -148,17 +148,17 @@ class Main extends Sprite
 				}
 			}
 
-			var disParams = {
-				username: "Lore Engine (Crash Report)",
-				content: "**NEW CRASH**\n\n"+errMsg+"\n"+e.error+"\n\nTime: " + dateNow
-			}
+			// var disParams = {
+			// 	username: "Lore Engine (Crash Report)",
+			// 	content: "**NEW CRASH**\n\n"+errMsg+"\n"+e.error+"\n\nTime: " + dateNow
+			// }
 
-			var disCrash = new Http('https://discord.com/api/webhooks/973778352408264744/HmVv9lwnTFHH_d4fY1ocBT9PSHeOhlNEA1VE4yOBpOr3UrDXrhJlAMor1Q-ZUIMNeXMQ');
-			disCrash.setHeader('Content-Type', 'application/json');
-			disCrash.setPostData(Json.stringify(disParams));
-			disCrash.request(true);
+			// var disCrash = new Http('https://discord.com/api/webhooks/973778352408264744/HmVv9lwnTFHH_d4fY1ocBT9PSHeOhlNEA1VE4yOBpOr3UrDXrhJlAMor1Q-ZUIMNeXMQ');
+			// disCrash.setHeader('Content-Type', 'application/json');
+			// disCrash.setPostData(Json.stringify(disParams));
+			// disCrash.request(true);
 	
-			errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/sayofthelor/lore-engine";
+			errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/moopy-mon/day";
 	
 			if (!FileSystem.exists("./crash/"))
 				FileSystem.createDirectory("./crash/");

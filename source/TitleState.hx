@@ -1,5 +1,6 @@
 package;
 
+import flixel.graphics.FlxGraphic;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -267,11 +268,11 @@ class TitleState extends MusicBeatState
 		lore.Colorblind.updateFilter();
 		var bg:FlxSprite = new FlxSprite();
 
-		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none"){
-			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
-		}else{
-			bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		}
+		var moop:BitmapData = BitmapData.fromFile("assets/shared/images/moopy/week1bg.png");
+		var moop2:FlxGraphic = FlxGraphic.fromBitmapData(moop);
+		moop2.persist = true;
+
+		bg.loadGraphic(moop2);
 
 		// bg.antialiasing = ClientPrefs.globalAntialiasing;
 		// bg.setGraphicSize(Std.int(bg.width * 0.6));
@@ -280,6 +281,7 @@ class TitleState extends MusicBeatState
 
 		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+		logoBl.screenCenter();
 
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
@@ -319,13 +321,12 @@ class TitleState extends MusicBeatState
 			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
 			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
 			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
-				gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
-				gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-				gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+				gfDance.frames = Paths.getSparrowAtlas('images/yousmellbad');
+				gfDance.animation.addByPrefix("idle", "Moopy Idle", 24, false);
 		}
 		gfDance.antialiasing = ClientPrefs.globalAntialiasing;
 
-		add(gfDance);
+		//add(gfDance);
 		gfDance.shader = swagShader.shader;
 		add(logoBl);
 		logoBl.shader = swagShader.shader;
@@ -352,7 +353,6 @@ class TitleState extends MusicBeatState
 		titleText.antialiasing = ClientPrefs.globalAntialiasing;
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
-		// titleText.screenCenter(X);
 		add(titleText);
 
 		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
@@ -546,10 +546,11 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	function addMoreText(text:String, ?offset:Float = 0)
+	function addMoreText(text:String, ?offset:Float = 0, ?color:FlxColor = FlxColor.WHITE)
 	{
 		if(textGroup != null && credGroup != null) {
 			var coolText:Alphabet = new Alphabet(0, 0, text, true, false);
+			coolText.color = color;
 			coolText.screenCenter(X);
 			coolText.y += (textGroup.length * 60) + 200 + offset;
 			credGroup.add(coolText);
@@ -575,61 +576,53 @@ class TitleState extends MusicBeatState
 			logoBl.animation.play('bump', true);
 
 		if(gfDance != null) {
-			danceLeft = !danceLeft;
-			if (danceLeft)
-				gfDance.animation.play('danceRight');
-			else
-				gfDance.animation.play('danceLeft');
+			gfDance.animation.play("idle");
 		}
 
 		if(!closedState) {
 			switch (curBeat)
 			{
-				case 1:
-					createCoolText(['sayofthelor']);
+				case 2:
+					createCoolText(['Moopy', 'sayofthelor', "Req", "gemstonezVA", "and a ton more"]);
 				// credTextShit.visible = true;
 				case 3:
 					addMoreText('presents');
 				// credTextShit.text += '\npresent...';
 				// credTextShit.addText();
-				case 4:
-					deleteCoolText();
 				// credTextShit.visible = false;
 				// credTextShit.text = 'In association \nwith';
 				// credTextShit.screenCenter();
 				case 5:
-					createCoolText(['lmao'], -40);
+					deleteCoolText();
+					createCoolText(['Demo made for'], -40);
 				case 7:
-					addMoreText('newgrounds', -40);
-					ngSpr.visible = true;
+					addMoreText('Funkin\' Shock', -35, FlxColor.CYAN);
 				// credTextShit.text += '\nNewgrounds';
 				case 8:
 					deleteCoolText();
-					ngSpr.visible = false;
 				// credTextShit.visible = false;
 
 				// credTextShit.text = 'Shoutouts Tom Fulp';
 				// credTextShit.screenCenter();
 				case 9:
-					createCoolText([curWacky[0]]);
+					createCoolText(["Moopy"]);
 				// credTextShit.visible = true;
 				case 11:
-					addMoreText(curWacky[1]);
+					addMoreText("Tuesday?", 0, FlxColor.GREEN);
 				// credTextShit.text += '\nlmao';
 				case 12:
 					deleteCoolText();
-					addMoreText('Friday');
 				// credTextShit.visible = false;
 				// credTextShit.text = "Friday";
 				// credTextShit.screenCenter();
 				case 13:
-					addMoreText('Night');
+					addMoreText('Moopy');
 				// credTextShit.visible = true;
 				case 14:
-					addMoreText('Funkin\'');
+					addMoreText('Monday');
 				// credTextShit.text += '\nNight';
 				case 15:
-					addMoreText('Lore Engine'); // credTextShit.text += '\nFunkin';
+					addMoreText('Demo'); // credTextShit.text += '\nFunkin';
 
 				case 16:
 					skipIntro();

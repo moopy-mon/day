@@ -29,6 +29,7 @@ import sys.FileSystem;
 #end
 import Type.ValueType;
 import DialogueBoxPsych;
+import lime.utils.Assets;
 
 #if desktop
 import Discord;

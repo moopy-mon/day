@@ -23,8 +23,8 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.onChange = lore.Colorblind.updateFilter;
 		addOption(option);
 
-		var option:Option = new Option('Show Lore Engine Watermark',
-			"If unchecked, the Lore Engine watermark and version number will not be in the FPS counter.",
+		var option:Option = new Option('Show Moopy Monday Watermark',
+			"If unchecked, the Moopy Monday watermark and version number will not be in the FPS counter.",
 			'showLore',
 			'bool',
 			true);
@@ -159,8 +159,8 @@ class VisualsUISubState extends BaseOptionsMenu
 			"What song do you prefer for the Pause Screen?",
 			'pauseMusic',
 			'string',
-			'Tea Time',
-			['None', 'Breakfast', 'Tea Time']);
+			'Moop-Fi',
+			['None', 'Breakfast', 'Tea Time', 'Moop-Fi']);
 		addOption(option);
 		option.onChange = onChangePauseMusic;
 

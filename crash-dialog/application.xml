@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-    <meta title="Lore Engine Crash Dialog" package="CrashDialog" version="1.0.0" company="" />
+    <meta title="Moopy Monday Crash Dialog" package="CrashDialog" version="1.0.0" company="" />
     <app main="CrashDialog" file="CrashDialog" path="build/openfl" />
 
     <window background="#FFFFFF" fps="60" resizable="false"/>

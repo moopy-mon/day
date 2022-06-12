@@ -1,53 +1,47 @@
 {
+	"storyName": "moop",
+	"hideFreeplay": false,
+	"weekBackground": "",
+	"weekBefore": "week1",
+	"startUnlocked": true,
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
 	"songs": [
 		[
-			"Bopeebo",
-			"dad",
+			"Serene",
+			"moopy",
 			[
-				146,
-				113,
-				253
+				179,
+				6,
+				243
 			],
 			false
 		],
 		[
-			"Fresh",
-			"dad",
+			"Vibin",
+			"moopy",
 			[
-				146,
-				113,
-				253
+				179,
+				6,
+				243
 			],
 			false
 		],
 		[
-			"Dad Battle",
-			"dad",
+			"Moopwave",
+			"moopy",
 			[
-				146,
-				113,
-				253
+				179,
+				6,
+				243
 			],
 			false
 		]
 	],
-	"hiddenUntilUnlocked": false,
-	"hideFreeplay": false,
-	"weekBackground": "stage",
-	"difficulties": "",
-	"weekCharacters": [
-		"dad",
-		"bf",
-		"gf"
-	],
-	"storyName": "Your New Week",
-	"weekName": "Custom Week",
-	"freeplayColor": [
-		146,
-		113,
-		253
-	],
 	"hideStoryMode": false,
-	"weekBefore": "tutorial",
-	"startUnlocked": true
+	"weekName": "Week 1",
+	"difficulties":"Hard"
 }

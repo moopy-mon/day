@@ -48,10 +48,10 @@ class MainMenuState extends MusicBeatState
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
-		#if MODS_ALLOWED 'mods', #end
-		#if ACHIEVEMENTS_ALLOWED 'awards', #end
-		'credits',
-		#if !switch 'donate', #end
+		// #if MODS_ALLOWED 'mods', #end
+		// #if ACHIEVEMENTS_ALLOWED 'awards', #end
+		// 'credits',
+		// #if !switch 'donate', #end
 		'options'
 	];
 
@@ -270,11 +270,13 @@ class MainMenuState extends MusicBeatState
 				}
 			}
 			#if cpp
+			#if debug
 			else if (FlxG.keys.anyJustPressed(debugKeys))
 			{
 				selectedSomethin = true;
 				MusicBeatState.switchState(new MasterEditorMenu());
 			}
+			#end
 			#end
 		}
 
