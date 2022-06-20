@@ -1,0 +1,47 @@
+{
+	"storyName": "moop",
+	"hideFreeplay": false,
+	"weekBackground": "",
+	"weekBefore": "week1",
+	"startUnlocked": true,
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"songs": [
+		[
+			"Serene",
+			"moopy",
+			[
+				179,
+				6,
+				243
+			],
+			false
+		],
+		[
+			"Vibin",
+			"moopy",
+			[
+				179,
+				6,
+				243
+			],
+			false
+		],
+		[
+			"Moopwave",
+			"moopy",
+			[
+				179,
+				6,
+				243
+			],
+			false
+		]
+	],
+	"hideStoryMode": false,
+	"weekName": "Week 1",
+	"difficulties":"Hard"
+}
