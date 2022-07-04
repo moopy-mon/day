@@ -39,7 +39,7 @@ class MainMenuState extends MusicBeatState
 {
 	var menuJson:MenuJSONData = Json.parse(Paths.getTextFromFile("data/menu.json"));
 	public static var loreEngineVersion:String = '0.5.0';
-	public static var psychEngineVersion:String = '0.5.2'; // to maximize compatibility
+	public static var psychEngineVersion:String = '0.6.2'; // to maximize compatibility
 	public static var curSelected:Int = 0;
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Free_Checker'), 0.2, 0.2, true, true);
 	var menuItems:FlxTypedGroup<FlxSprite>;
@@ -65,6 +65,9 @@ class MainMenuState extends MusicBeatState
 	}
 	override function create()
 	{
+		#if MODS_ALLOWED
+		Paths.pushGlobalMods();
+		#end
 		WeekData.loadTheFirstEnabledMod();
 
 		#if desktop
@@ -147,7 +150,7 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Lore v" + (loreEngineVersion.endsWith(".0") ? loreEngineVersion.replace(".0", "") : loreEngineVersion) + " x Funkin' v" + Application.current.meta.get('version')#if debug + " (debug)"#end, 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, (ClientPrefs.showLore ? "Lore Engine v" + (loreEngineVersion.endsWith(".0") ? loreEngineVersion.replace(".0", "") + " \\ " : loreEngineVersion) : "") + "Friday Night Funkin' v" + Application.current.meta.get('version')#if debug + " (debug)"#end, 12);
 		versionShit.scrollFactor.set();
 		if (menuJson.overrideVersionText && menuJson.customVersionText != "") versionShit.text = menuJson.customVersionText;
 		versionShit.screenCenter(X);
@@ -190,6 +193,7 @@ class MainMenuState extends MusicBeatState
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+			if(FreeplayState.vocals != null) FreeplayState.vocals.volume += 0.5 * elapsed;
 		}
 		checker.x -= 0.45 / (ClientPrefs.framerate / 60);
 		checker.y -= 0.16 / (ClientPrefs.framerate / 60);
