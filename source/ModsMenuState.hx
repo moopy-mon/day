@@ -52,8 +52,10 @@ class ModsMenuState extends MusicBeatState
 
 	override function create()
 	{
-		Paths.clearStoredMemory();
-		Paths.clearUnusedMemory();
+		if(!ClientPrefs.persistentCaching) {
+			Paths.clearStoredMemory();
+			Paths.clearUnusedMemory();
+		}
 		WeekData.setDirectoryFromWeek();
 
 		#if desktop
@@ -730,6 +732,14 @@ class ModMetadata
 				if(description != null && description.length > 0)
 				{
 					this.description = description;
+				}
+				if(name == 'Name')
+				{
+					this.name = folder;
+				}
+				if(description == 'Description')
+				{
+					this.description = "No description provided.";
 				}
 				if(colors != null && colors.length > 2)
 				{

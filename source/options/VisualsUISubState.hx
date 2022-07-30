@@ -19,15 +19,8 @@ class VisualsUISubState extends BaseOptionsMenu
 			"PROTANOPIA",
 			"TRITANOPIA",]
 			);
-		#if debug option.description += "\nUses a lot of resources in debug mode, so it's recommended to lower the FPS cap."; #end
+		#if debug option.description += "\nCan use a lot of resources in debug mode depending on system configuration, so it's recommended to lower the FPS cap."; #end
 		option.onChange = lore.Colorblind.updateFilter;
-		addOption(option);
-
-		var option:Option = new Option('Show Moopy Monday Watermark',
-			"If unchecked, the Moopy Monday watermark and version number will not be in the FPS counter.",
-			'showLore',
-			'bool',
-			true);
 		addOption(option);
 
 		var option:Option = new Option('Scroll Underlay Opacity', //Name
@@ -67,6 +60,18 @@ class VisualsUISubState extends BaseOptionsMenu
 			false); //Default value
 		addOption(option);
 
+		var option:Option = new Option('Rating Scale',
+			'How large the ratings should be.',
+			'ratingScale',
+			'percent',
+		1);
+		option.scrollSpeed = 1.6;
+		option.minValue = 0.25;
+		option.maxValue = 1;
+		option.changeValue = 0.05;
+		option.decimals = 2;
+		addOption(option);
+
 		var option:Option = new Option('Smaller Icons', //Name
 			'If checked, the health icons will be smaler on the health bar.', //Description
 			'tinyIcons', //Save data variable name
@@ -98,6 +103,13 @@ class VisualsUISubState extends BaseOptionsMenu
 			'string',
 			'SN and Time Left',
 			['SN and Time Left', 'SN and Time Elapsed', 'Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
+		addOption(option);
+
+		var option:Option = new Option('New Time Bar',
+			"Toggles between the old and new time bar.",
+			'newTimeBar',
+			'bool',
+			true);
 		addOption(option);
 
 		var option:Option = new Option('Flashing Lights',
@@ -153,6 +165,20 @@ class VisualsUISubState extends BaseOptionsMenu
 			'fpsPosition',
 			'string',
 			'BOTTOM LEFT', ['TOP LEFT', 'BOTTOM LEFT']);
+		addOption(option);
+		
+		var option:Option = new Option('Show Moopy Monday Watermark',
+			"If checked, the Moopy Monday watermark and version number will be in the FPS counter.",
+			'showLore',
+			'bool',
+			true);
+		addOption(option);
+
+		var option:Option = new Option('Show Memory Usage',
+			"If checked, current memory usage in MB will be in the FPS counter.",
+			'showMem',
+			'bool',
+			true);
 		addOption(option);
 		#end
 		

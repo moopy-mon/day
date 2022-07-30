@@ -8,6 +8,9 @@ import Controls;
 class ClientPrefs {
 	public static var downScroll:Bool = false;
 	public static var showLore:Bool = true;
+	public static var showMem:Bool = true;
+	public static var persistentCaching:Bool = false;
+	public static var ratingScale:Float = 1;
 	public static var middleScroll:Bool = false;
 	public static var opponentStrums:Bool = true;
 	public static var showFPS:Bool = true;
@@ -15,6 +18,7 @@ class ClientPrefs {
 	public static var globalAntialiasing:Bool = true;
 	public static var noteSplashes:Bool = true;
 	public static var lowQuality:Bool = false;
+	public static var shaders:Bool = true;
 	public static var framerate:Int = 60;
 	public static var underlayAlpha:Int = 0;
 	public static var hitSounds:String = "OFF";
@@ -33,7 +37,6 @@ class ClientPrefs {
 	public static var noteOffset:Int = 0;
 	public static var smJudges:Bool = false;
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
-	public static var imagesPersist:Bool = false;
 	public static var ghostTapping:Bool = true;
 	public static var timeBarType:String = 'Time Left';
 	public static var scoreZoom:Bool = true;
@@ -41,6 +44,7 @@ class ClientPrefs {
 	public static var healthBarAlpha:Float = 1;
 	public static var controllerMode:Bool = false;
 	public static var pauseMusic:String = 'Moop-Fi';
+	public static var newTimeBar:Bool = true;
 	public static var checkForUpdates:Bool = false;
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
@@ -112,11 +116,15 @@ class ClientPrefs {
 		FlxG.save.data.middleScroll = middleScroll;
 		FlxG.save.data.opponentStrums = opponentStrums;
 		FlxG.save.data.showFPS = showFPS;
+		FlxG.save.data.showMem = showMem;
+		FlxG.save.data.persistentCaching = persistentCaching;
+		FlxG.save.data.ratingScale = ratingScale;
 		FlxG.save.data.flashing = flashing;
 		FlxG.save.data.globalAntialiasing = globalAntialiasing;
 		FlxG.save.data.noteSplashes = noteSplashes;
 		FlxG.save.data.tinyIcons = tinyIcons;
 		FlxG.save.data.lowQuality = lowQuality;
+		FlxG.save.data.shaders = shaders;
 		FlxG.save.data.framerate = framerate;
 		FlxG.save.data.hitSounds = hitSounds;
 		FlxG.save.data.optimization = optimization;
@@ -129,8 +137,8 @@ class ClientPrefs {
 		FlxG.save.data.camZooms = camZooms;
 		FlxG.save.data.noteOffset = noteOffset;
 		FlxG.save.data.hideHud = hideHud;
+		FlxG.save.data.newTimeBar = newTimeBar;
 		FlxG.save.data.arrowHSV = arrowHSV;
-		FlxG.save.data.imagesPersist = imagesPersist;
 		FlxG.save.data.ghostTapping = ghostTapping;
 		FlxG.save.data.timeBarType = timeBarType;
 		FlxG.save.data.scoreZoom = scoreZoom;
@@ -169,11 +177,23 @@ class ClientPrefs {
 		if(FlxG.save.data.showLore != null) {
 			showLore = FlxG.save.data.showLore;
 		}
+		if(FlxG.save.data.showMem != null) {
+			showMem = FlxG.save.data.showMem;
+		}
+		if(FlxG.save.data.persistentCaching != null) {
+			persistentCaching = FlxG.save.data.persistentCaching;
+		}
+		if(FlxG.save.data.ratingScale != null) {
+			ratingScale = FlxG.save.data.ratingScale;
+		}
 		if(FlxG.save.data.bopStyle != null) {
 			bopStyle = FlxG.save.data.bopStyle;
 		}
 		if(FlxG.save.data.showNoteTimeHitbox != null) {
 			showNoteTimeHitbox = FlxG.save.data.showNoteTimeHitbox;
+		}
+		if(FlxG.save.data.newTimeBar != null) {
+			newTimeBar = FlxG.save.data.newTimeBar;
 		}
 		if(FlxG.save.data.colorblindFilter != null) {
 			colorblindFilter = FlxG.save.data.colorblindFilter;
@@ -222,6 +242,9 @@ class ClientPrefs {
 		}
 		if(FlxG.save.data.lowQuality != null) {
 			lowQuality = FlxG.save.data.lowQuality;
+		}
+		if(FlxG.save.data.shaders != null) {
+			shaders = FlxG.save.data.shaders;
 		}
 		if(FlxG.save.data.framerate != null) {
 			framerate = FlxG.save.data.framerate;
