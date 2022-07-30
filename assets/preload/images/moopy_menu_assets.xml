@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="moopy_menu_assets.png">
+	<!-- Created with Adobe Animate version 22.0.5.191 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="extras0000" x="0" y="0" width="733" height="274"/>
+	<SubTexture name="extras0001" x="0" y="274" width="733" height="274"/>
+	<SubTexture name="extras0002" x="0" y="548" width="733" height="274"/>
+	<SubTexture name="options0000" x="0" y="822" width="324" height="173"/>
+	<SubTexture name="options0001" x="324" y="822" width="324" height="173"/>
+	<SubTexture name="options0002" x="0" y="995" width="324" height="173"/>
+	<SubTexture name="story mode0000" x="0" y="1168" width="733" height="274"/>
+	<SubTexture name="story mode0001" x="0" y="1442" width="733" height="274"/>
+	<SubTexture name="story mode0002" x="0" y="1716" width="733" height="274"/>
+</TextureAtlas>
