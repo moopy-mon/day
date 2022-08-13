@@ -3559,29 +3559,9 @@
 				56470.5882352941,
 				[
 					[
-						"Blammed Lights",
-						"3",
-						""
-					],
-					[
 						"Change Scroll Speed",
 						"0.6",
 						"1"
-					]
-				]
-			],
-			[
-				67764.7058823529,
-				[
-					[
-						"Blammed Lights",
-						"1",
-						""
-					],
-					[
-						"Camera Follow Pos",
-						"",
-						""
 					]
 				]
 			],
@@ -3669,11 +3649,6 @@
 				79058.8235294117,
 				[
 					[
-						"Blammed Lights",
-						"3",
-						""
-					],
-					[
 						"Change Scroll Speed",
 						"1",
 						"1"
@@ -3754,11 +3729,6 @@
 				90352.9411764705,
 				[
 					[
-						"Blammed Lights",
-						"1",
-						""
-					],
-					[
 						"Change Scroll Speed",
 						"1",
 						"1"
@@ -3834,27 +3804,8 @@
 						""
 					]
 				]
-			],
-			[
-				101647.058823529,
-				[
-					[
-						"Blammed Lights",
-						"4",
-						""
-					]
-				]
-			],
-			[
-				101823.529411765,
-				[
-					[
-						"Blammed Lights",
-						"5",
-						""
-					]
-				]
 			]
+			
 		],
 		"player2": "nba_moopboy",
 		"player3": null,

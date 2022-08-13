@@ -1,0 +1,27 @@
+{
+	"storyName": "moop2",
+	"hideFreeplay": false,
+	"weekBackground": "",
+	"weekBefore": "week1",
+	"startUnlocked": true,
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"songs": [
+		[
+			"Erect",
+			"moopy",
+			[
+				159,
+				0,
+				223
+			],
+			false
+		]
+	],
+	"hideStoryMode": true,
+	"weekName": "Week 2",
+	"difficulties":"Hard"
+}

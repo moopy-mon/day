@@ -1,3 +1,5 @@
+import Shaders.GlitchEffect;
+import Shaders.GlitchShader;
 import haxe.iterators.StringIterator;
 #if LUA_ALLOWED
 import llua.Lua;
@@ -2829,6 +2831,8 @@ class FunkinLua {
 			haxeInterp.variables.set('ClientPrefs', ClientPrefs);
 			haxeInterp.variables.set('Character', Character);
 			haxeInterp.variables.set('Alphabet', Alphabet);
+			haxeInterp.variables.set('GlitchShader', GlitchShader);
+			haxeInterp.variables.set('GlitchEffect', GlitchEffect);
 			#if !flash
 			haxeInterp.variables.set('FlxRuntimeShader', FlxRuntimeShader);
 			haxeInterp.variables.set('ShaderFilter', openfl.filters.ShaderFilter);

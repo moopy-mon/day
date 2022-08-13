@@ -93,7 +93,7 @@ class NewMenu extends MusicBeatState {
     }
     function keepGoing() {
         if (selected == 0) MusicBeatState.switchState(new StoryMenuState());
-        if (selected == 1) MusicBeatState.switchState(new FreeplayState());
-        if (selected == 2) MusicBeatState.switchState(new options.OptionsState());
+        else if (selected == 1) MusicBeatState.switchState(new ExtrasState());
+        else if (selected == 2) MusicBeatState.switchState(new options.OptionsState());
     }
 }
