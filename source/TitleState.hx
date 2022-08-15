@@ -92,7 +92,7 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		if(!ClientPrefs.persistentCaching) {
+		if (!ClientPrefs.persistentCaching) {
 			Paths.clearStoredMemory();
 			Paths.clearUnusedMemory();
 		}
