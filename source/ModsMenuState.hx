@@ -52,10 +52,11 @@ class ModsMenuState extends MusicBeatState
 
 	override function create()
 	{
-		if(!ClientPrefs.persistentCaching) {
+		if (!ClientPrefs.persistentCaching) {
 			Paths.clearStoredMemory();
 			Paths.clearUnusedMemory();
 		}
+
 		WeekData.setDirectoryFromWeek();
 
 		#if desktop
