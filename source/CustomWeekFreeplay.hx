@@ -25,7 +25,7 @@ import sys.FileSystem;
 
 using StringTools;
 
-class MainWeekFreeplay extends MusicBeatState
+class CustomWeekFreeplay extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
 
@@ -52,6 +52,10 @@ class MainWeekFreeplay extends MusicBeatState
 	var colorTween:FlxTween;
     var actualWeekNumber:Int = 0; // hey stupid documentation this is the thing you have to change for each state, main is 1, erect is 2, and bonus is 3
 
+	override public function new(actualWeekNumber:Int = 0):Void {
+		this.actualWeekNumber = actualWeekNumber;
+		super();
+	}
 	override function create()
 	{
         FlxTransitionableState.skipNextTransOut = true;

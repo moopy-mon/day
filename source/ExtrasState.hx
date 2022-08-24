@@ -34,7 +34,7 @@ class ExtrasState extends MusicBeatState
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Substate_Checker'), 0.2, 0.2, true, true);
 	public static var checkerX:Float = 0;
 	public static var checkerY:Float = 0;
-	var options:Array<String> = ['Main Week', 'Erect Mode', 'Extra Songs'];
+	var options:Array<String> = ['Main Story', 'Rivals', 'Misc'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
@@ -42,12 +42,12 @@ class ExtrasState extends MusicBeatState
 	function openSelectedState(label:String) {
 		FlxTransitionableState.skipNextTransOut = true;
 		switch(label) {
-			case 'Main Week':
-				MusicBeatState.switchState(new MainWeekFreeplay());
-			case 'Erect Mode':
-				MusicBeatState.switchState(new ErectFreeplay());
-			case 'Extra Songs':
-				MusicBeatState.switchState(new FreeplayState());
+			case 'Main Story':
+				MusicBeatState.switchState(new CustomWeekFreeplay(0));
+			case 'Rivals':
+				MusicBeatState.switchState(new CustomWeekFreeplay(1));
+			case 'Misc':
+				MusicBeatState.switchState(new CustomWeekFreeplay(2));
 		}
 	}
 

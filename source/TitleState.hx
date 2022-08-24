@@ -1,5 +1,6 @@
 package;
 
+import shadertoy.FlxShaderToyRuntimeShader;
 import flixel.graphics.FlxGraphic;
 #if desktop
 import Discord.DiscordClient;
@@ -241,7 +242,10 @@ class TitleState extends MusicBeatState
 	var gfDance:FlxSprite;
 	var danceLeft:Bool = false;
 	var titleText:FlxSprite;
+	var titleTextButActuallyText:FlxText;
 	var swagShader:ColorSwap = null;
+	var coolShader:Dynamic = null;
+	var logo:FlxSprite;
 
 	function startIntro()
 	{
@@ -280,11 +284,12 @@ class TitleState extends MusicBeatState
 		lore.Colorblind.updateFilter();
 		var bg:FlxSprite = new FlxSprite();
 
-		var moop:BitmapData = BitmapData.fromFile("assets/shared/images/moopy/week1bg.png");
-		var moop2:FlxGraphic = FlxGraphic.fromBitmapData(moop);
-		moop2.persist = true;
 
-		bg.loadGraphic(moop2);
+		bg.makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
+
+		coolShader = new FlxShaderToyRuntimeShader(File.getContent(Paths.shaderFragment("titleScreen")), bg.width, bg.height);
+		bg.shader = coolShader;
+
 
 		// bg.antialiasing = ClientPrefs.globalAntialiasing;
 		// bg.setGraphicSize(Std.int(bg.width * 0.6));
@@ -382,11 +387,16 @@ class TitleState extends MusicBeatState
 		titleText.antialiasing = ClientPrefs.globalAntialiasing;
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
-		add(titleText);
+		// add(titleText);
 
-		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
+		logo = new FlxSprite().loadGraphic(Paths.image('logo'));
 		logo.screenCenter();
 		logo.antialiasing = ClientPrefs.globalAntialiasing;
+
+		titleTextButActuallyText = new FlxText(0, logo.y + logo.height + 40, FlxG.width, "Press Enter to Begin").setFormat(Paths.font("SegoeBold.ttf"), 32, 0xFFFFFFFF, CENTER, OUTLINE);
+		titleTextButActuallyText.borderSize = 3;
+		titleText.screenCenter(X);
+		add(titleTextButActuallyText);
 		// add(logo);
 
 		// FlxTween.tween(logoBl, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG});
@@ -447,6 +457,7 @@ class TitleState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		if (coolShader != null) coolShader.update(elapsed, null);
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
