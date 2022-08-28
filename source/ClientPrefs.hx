@@ -38,7 +38,7 @@ class ClientPrefs {
 	public static var smJudges:Bool = false;
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
 	public static var ghostTapping:Bool = true;
-	public static var timeBarType:String = 'Time Left';
+	public static var timeBarType:String = 'SN and Time Left';
 	public static var scoreZoom:Bool = true;
 	public static var noReset:Bool = false;
 	public static var healthBarAlpha:Float = 1;
@@ -47,6 +47,8 @@ class ClientPrefs {
 	public static var newTimeBar:Bool = true;
 	public static var showMS:Bool = true;
 	public static var checkForUpdates:Bool = true;
+	public static var cacheAudio:Bool = false;
+	public static var cacheImages:Bool = false;
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
 		'scrolltype' => 'multiplicative', 
@@ -117,6 +119,8 @@ class ClientPrefs {
 		FlxG.save.data.colorblindFilter = colorblindFilter;
 		FlxG.save.data.middleScroll = middleScroll;
 		FlxG.save.data.opponentStrums = opponentStrums;
+		FlxG.save.data.cacheAudio = cacheAudio;
+		FlxG.save.data.cacheImages = cacheImages;
 		FlxG.save.data.showFPS = showFPS;
 		FlxG.save.data.showMem = showMem;
 		FlxG.save.data.persistentCaching = persistentCaching;
@@ -208,6 +212,12 @@ class ClientPrefs {
 		}
 		if(FlxG.save.data.optimization != null) {
 			optimization = FlxG.save.data.optimization;
+		}
+		if(FlxG.save.data.cacheAudio != null) {
+			cacheAudio = FlxG.save.data.cacheAudio;
+		}
+		if(FlxG.save.data.cacheImages != null) {
+			cacheImages = FlxG.save.data.cacheImages;
 		}
 		if(FlxG.save.data.tinyIcons != null) {
 			tinyIcons = FlxG.save.data.tinyIcons;

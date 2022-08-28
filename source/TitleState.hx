@@ -93,16 +93,11 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		if (!ClientPrefs.persistentCaching) {
+		if (!ClientPrefs.persistentCaching && !ClientPrefs.cacheImages) {
 			Paths.clearStoredMemory();
 			Paths.clearUnusedMemory();
 		}
 
-		#if LUA_ALLOWED
-		Paths.pushGlobalMods();
-		#end
-		// Just to load a mod on start up if ya got one. For mods that change the menu music and bg
-		WeekData.loadTheFirstEnabledMod();
 
 		//trace(path, FileSystem.exists(path));
 
@@ -127,18 +122,12 @@ class TitleState extends MusicBeatState
 		FlxG.sound.volumeUpKeys = volumeUpKeys;
 		FlxG.keys.preventDefaultKeys = [TAB];
 
-		PlayerSettings.init();
-
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		// DEBUG BULLSHIT
 
 		swagShader = new ColorSwap();
 		super.create();
-
-		FlxG.save.bind('funkin', 'ninjamuffin99');
-
-		ClientPrefs.loadPrefs();
 
 		#if CHECK_FOR_UPDATES
 		if(ClientPrefs.checkForUpdates && !closedState) {
@@ -281,7 +270,6 @@ class TitleState extends MusicBeatState
 
 		Conductor.changeBPM(titleJSON.bpm);
 		persistentUpdate = true;
-		lore.Colorblind.updateFilter();
 		var bg:FlxSprite = new FlxSprite();
 
 

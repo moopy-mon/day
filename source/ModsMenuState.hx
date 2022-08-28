@@ -52,7 +52,7 @@ class ModsMenuState extends MusicBeatState
 
 	override function create()
 	{
-		if (!ClientPrefs.persistentCaching) {
+		if (!ClientPrefs.persistentCaching && !ClientPrefs.cacheImages) {
 			Paths.clearStoredMemory();
 			Paths.clearUnusedMemory();
 		}

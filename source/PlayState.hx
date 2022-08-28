@@ -336,7 +336,7 @@ class PlayState extends MusicBeatState
 
 	override public function create()
 	{
-		if (!ClientPrefs.persistentCaching) {
+		if (!ClientPrefs.persistentCaching && !ClientPrefs.cacheImages) {
 			Paths.clearStoredMemory();
 			Paths.clearUnusedMemory();
 		}
@@ -4238,7 +4238,6 @@ class PlayState extends MusicBeatState
 	public var showRating:Bool = true;
 	var rating:FlxSprite;
 	var lastRating:FlxSprite = new FlxSprite();
-	var comboSpr:FlxSprite;
 	var ratingTween:FlxTween;
 	var numGroup:FlxGroup = new FlxGroup();
 	var noteDiffGroup:FlxTypedGroup<FlxText> = new FlxTypedGroup<FlxText>();
@@ -4377,19 +4376,6 @@ class PlayState extends MusicBeatState
 			}
 		});
 		
-		comboSpr = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
-		comboSpr.cameras = [camHUD];
-		comboSpr.screenCenter();
-		comboSpr.x = coolText.x;
-		if(!ClientPrefs.smJudges) {
-		comboSpr.acceleration.y = 600;
-		comboSpr.velocity.y -= 150;
-		}
-		comboSpr.visible = (!ClientPrefs.hideHud && showCombo);
-		comboSpr.x += ClientPrefs.comboOffset[0];
-		comboSpr.y -= ClientPrefs.comboOffset[1];
-		comboSpr.y += 60;
-		comboSpr.velocity.x += FlxG.random.int(1, 10);
 		remove(rating);
 		add(rating);
 
@@ -4397,17 +4383,13 @@ class PlayState extends MusicBeatState
 		{
 			rating.setGraphicSize(Std.int(rating.width * 0.7));
 			rating.antialiasing = ClientPrefs.globalAntialiasing;
-			comboSpr.setGraphicSize(Std.int(comboSpr.width * 0.7));
-			comboSpr.antialiasing = ClientPrefs.globalAntialiasing;
 		}
 		else
 		{
 			rating.setGraphicSize(Std.int(rating.width * daPixelZoom * 0.85));
-			comboSpr.setGraphicSize(Std.int(comboSpr.width * daPixelZoom * 0.85));
 		}
 
 		rating.scale.set(rating.scale.x * ClientPrefs.ratingScale, rating.scale.y * ClientPrefs.ratingScale);
-		comboSpr.updateHitbox();
 		rating.updateHitbox();
 
 		var seperatedScore:Array<Int> = [];
@@ -4512,14 +4494,6 @@ class PlayState extends MusicBeatState
 			startDelay: Conductor.crochet * 0.001
 		});
 
-		FlxTween.tween(comboSpr, {alpha: 0}, 0.2, {
-			onComplete: function(tween:FlxTween)
-			{
-				coolText.destroy();
-				comboSpr.destroy();
-			},
-			startDelay: Conductor.crochet * 0.002
-		});
 	}
 
 	public var strumsBlocked:Array<Bool> = [];

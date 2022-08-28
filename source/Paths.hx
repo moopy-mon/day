@@ -1,5 +1,6 @@
 package;
 
+import lore.Loader;
 import openfl.system.System;
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -58,7 +59,7 @@ class Paths
 	/// haya I love you for the base cache dump I took to the max
 	public static function clearUnusedMemory() {
 		// clear non local assets in the tracked assets list
-		for (key in currentTrackedAssets.keys()) {
+		if (!ClientPrefs.cacheImages) for (key in currentTrackedAssets.keys()) {
 			// if it is not currently contained within the used local assets
 			if (!localTrackedAssets.contains(key)
 				&& !dumpExclusions.contains(key)) {
@@ -82,7 +83,7 @@ class Paths
 	public static function clearStoredMemory(?cleanUnused:Bool = false) {
 		// clear anything not in the tracked assets list
 		@:privateAccess
-		for (key in FlxG.bitmap._cache.keys())
+		if (!ClientPrefs.cacheImages) for (key in FlxG.bitmap._cache.keys())
 		{
 			var obj = FlxG.bitmap._cache.get(key);
 			if (obj != null && !currentTrackedAssets.exists(key)) {
@@ -93,7 +94,7 @@ class Paths
 		}
 
 		// clear all sounds that are cached
-		for (key in currentTrackedSounds.keys()) {
+		if (!ClientPrefs.cacheAudio) for (key in currentTrackedSounds.keys()) {
 			if (!localTrackedAssets.contains(key)
 			&& !dumpExclusions.contains(key) && key != null) {
 				//trace('test: ' + dumpExclusions, key);
@@ -330,6 +331,16 @@ class Paths
 	// completely rewritten asset loading? fuck!
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 	public static function returnGraphic(key:String, ?library:String) {
+		if (ClientPrefs.cacheImages) {
+			var img:FlxGraphic = lore.Loader.imgCache.getGraphic(key);
+			if (img != null) {
+				return img;
+			}
+			var img:FlxGraphic = lore.Loader.sharedImgCache.getGraphic(key);
+			if (img != null) {
+				return img;
+			}
+		}
 		#if MODS_ALLOWED
 		var modKey:String = modsImages(key);
 		if(FileSystem.exists(modKey)) {

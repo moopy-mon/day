@@ -58,8 +58,6 @@ class CustomWeekFreeplay extends MusicBeatState
 	}
 	override function create()
 	{
-        FlxTransitionableState.skipNextTransOut = true;
-        FlxTransitionableState.skipNextTransIn = true;
 		//Paths.clearStoredMemory();
 		//Paths.clearUnusedMemory();
 		
