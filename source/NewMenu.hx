@@ -22,7 +22,7 @@ class NewMenu extends MusicBeatState {
         s = new FlxShaderToyRuntimeShader(File.getContent(Paths.shaderFragment("titleScreen")), 1280, 720);
         moopbg.shader = s;
         moopbg.screenCenter();
-        var moopfg:FlxSprite = new FlxSprite(0, -360).loadGraphic(Paths.image("moopy/week1fg"));
+        var moopfg:FlxSprite = new FlxSprite(0, -360).loadGraphic(Paths.image("moopy/week1fg"), "shared");
         add(moopbg);
         add(moopfg);
 
