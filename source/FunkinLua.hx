@@ -1559,7 +1559,7 @@ class FunkinLua {
 				CustomFadeTransition.nextCamera = null;
 
 			if(PlayState.isStoryMode)
-				MusicBeatState.switchState(new StoryMenuState());
+				MusicBeatState.switchState(new NewMenu());
 			else
 				MusicBeatState.switchState(new FreeplayState());
 

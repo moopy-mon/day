@@ -1,7 +1,3 @@
-function onCreate()
-	setProperty("skipCountdown", true);
-end
-
 local allowCountdown = false
 
 function onStartCountdown()

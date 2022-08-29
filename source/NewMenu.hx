@@ -1,5 +1,6 @@
 package;
 
+import shadertoy.FlxShaderToyRuntimeShader;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.text.FlxText;
@@ -7,6 +8,7 @@ import flixel.graphics.FlxGraphic;
 import openfl.display.BitmapData;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tweens.FlxTween;
+import sys.io.File;
 
 class NewMenu extends MusicBeatState {
     var menuSpriteGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
@@ -14,10 +16,13 @@ class NewMenu extends MusicBeatState {
     var options:Array<String> = ["story mode", "extras", "options"];
     var optionYs:Array<Float> = [18, 263, 524];
     var selected:Int = 0;
+    var s:Dynamic;
     override public function create() {
-        var moopbg:FlxSprite = new FlxSprite().loadGraphic(FlxGraphic.fromBitmapData(BitmapData.fromFile("assets/shared/images/moopy/week1bg.png")));
+        var moopbg:FlxSprite = new FlxSprite().makeGraphic(1280, 720, 0xFF000000);
+        s = new FlxShaderToyRuntimeShader(File.getContent(Paths.shaderFragment("titleScreen")), 1280, 720);
+        moopbg.shader = s;
         moopbg.screenCenter();
-        var moopfg:FlxSprite = new FlxSprite(0, -360).loadGraphic(FlxGraphic.fromBitmapData(BitmapData.fromFile("assets/shared/images/moopy/week1fg.png")));
+        var moopfg:FlxSprite = new FlxSprite(0, -360).loadGraphic(Paths.image("moopy/week1fg"));
         add(moopbg);
         add(moopfg);
 
@@ -52,6 +57,9 @@ class NewMenu extends MusicBeatState {
         super.create();
     }
     override public function update(elapsed:Float) {
+        if (s != null && s is FlxShaderToyRuntimeShader) {
+            s.update(elapsed, null);
+        }
         super.update(elapsed);
         if (controls.UI_UP_P || controls.UI_DOWN_P) changeSelection(controls.UI_UP_P);
         if (controls.BACK) {

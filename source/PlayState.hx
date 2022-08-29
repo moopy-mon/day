@@ -868,7 +868,9 @@ class PlayState extends MusicBeatState
 		if (curStage == 'limo')
 			if (!ClientPrefs.optimization) add(limo);
 
-		if (!ClientPrefs.optimization) add(dadGroup);
+		if (!ClientPrefs.optimization)  {
+			add(dadGroup);
+		}
 		if (!ClientPrefs.optimization) add(boyfriendGroup);
 		
 		switch(curStage)
@@ -1032,7 +1034,10 @@ class PlayState extends MusicBeatState
 
 		dad = new Character(0, 0, SONG.player2);
 		startCharacterPos(dad, true);
-		if (!ClientPrefs.optimization) dadGroup.add(dad);
+		if (!ClientPrefs.optimization) { 
+			dadGroup.add(dad);
+			if (SONG.song.toLowerCase() == 'moopwave') addBehindDad(new flixel.addons.effects.FlxTrail(dad, null, 15, 5, 0.4, 0.0267));
+		}
 		startCharacterLua(dad.curCharacter);
 
 		boyfriend = new Boyfriend(0, 0, SONG.player1);
@@ -4128,7 +4133,7 @@ class PlayState extends MusicBeatState
 					if(FlxTransitionableState.skipNextTransIn) {
 						CustomFadeTransition.nextCamera = null;
 					}
-					MusicBeatState.switchState(new StoryMenuState());
+					MusicBeatState.switchState(new NewMenu());
 
 					// if ()
 					if(!ClientPrefs.getGameplaySetting('practice', false) && !ClientPrefs.getGameplaySetting('botplay', false)) {

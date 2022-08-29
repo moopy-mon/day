@@ -43,7 +43,7 @@ class Loader extends FlxState {
         add(loadText = new FlxText(4, 4, FlxG.width - 8, "Preloading..."));
         loadText.setFormat(Paths.font("vcr.ttf"), 32, 0xffffffff, "center");
         loadText.screenCenter();
-        loadText.y -= (36 + loadText.height);
+        loadText.y -= (44 + loadText.height);
         initCache();
     }
 
@@ -55,7 +55,8 @@ class Loader extends FlxState {
     ];
 
     static final preloadCacheList:Array<String> = [
-        "icons/"
+        "icons/",
+        ""
     ];
 
     var imgsToCache:Array<String> = [];
@@ -147,7 +148,7 @@ class Loader extends FlxState {
     }
 
     function generatePieDial():Void {
-        add(pie = new FlxPieDial(0, loadText.height + 68, 32, 0xFF007F00, totalCache, CIRCLE, true, 16));
+        add(pie = new FlxPieDial(0, loadText.height + 84, 40, 0xFF007F00, totalCache, CIRCLE, true, 20));
         pie.screenCenter();
     }
 
