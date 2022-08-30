@@ -19,6 +19,16 @@
 				223
 			],
 			false
+		],
+		[
+			"Strike",
+			"lightner",
+			[
+				238,
+				191,
+				106
+			],
+			false
 		]
 	],
 	"hideStoryMode": true,

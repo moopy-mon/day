@@ -51,6 +51,7 @@ class Loader extends FlxState {
         "",
         "moopy/",
         "moopy/erect/",
+        "moopy/strike/",
         "characters/"
     ];
 
