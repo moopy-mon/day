@@ -1,0 +1,27 @@
+{
+	"storyName": "moop2",
+	"hideFreeplay": false,
+	"weekBackground": "",
+	"weekBefore": "week2",
+	"startUnlocked": true,
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"songs": [
+		[
+			"Unstoppable",
+			"moopster",
+			[
+				159,
+				0,
+				223
+			],
+			false
+		]
+	],
+	"hideStoryMode": true,
+	"weekName": "Week 3",
+	"difficulties":"Hard"
+}
