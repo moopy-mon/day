@@ -496,9 +496,9 @@ class TitleState extends MusicBeatState
 								}
 							});
 							FlxG.sound.music.fadeOut();
-							if(FreeplayState.vocals != null)
+							if(CustomWeekFreeplay.vocals != null)
 							{
-								FreeplayState.vocals.fadeOut();
+								CustomWeekFreeplay.vocals.fadeOut();
 							}
 							closedState = true;
 							transitioning = true;
@@ -530,7 +530,7 @@ class TitleState extends MusicBeatState
 	{
 		for (i in 0...textArray.length)
 		{
-			var money:Alphabet = new Alphabet(0, 0, textArray[i], true, false);
+			var money:Alphabet = new Alphabet(0, 0, textArray[i], true);
 			money.screenCenter(X);
 			money.y += (i * 60) + 200 + offset;
 			if(credGroup != null && textGroup != null) {
@@ -543,7 +543,7 @@ class TitleState extends MusicBeatState
 	function addMoreText(text:String, ?offset:Float = 0, ?color:FlxColor = FlxColor.WHITE)
 	{
 		if(textGroup != null && credGroup != null) {
-			var coolText:Alphabet = new Alphabet(0, 0, text, true, false);
+			var coolText:Alphabet = new Alphabet(0, 0, text, true);
 			coolText.color = color;
 			coolText.screenCenter(X);
 			coolText.y += (textGroup.length * 60) + 200 + offset;
@@ -697,9 +697,9 @@ class TitleState extends MusicBeatState
 				if(easteregg == 'SHADOW')
 				{
 					FlxG.sound.music.fadeOut();
-					if(FreeplayState.vocals != null)
+					if(CustomWeekFreeplay.vocals != null)
 					{
-						FreeplayState.vocals.fadeOut();
+						CustomWeekFreeplay.vocals.fadeOut();
 					}
 				}
 				#end
