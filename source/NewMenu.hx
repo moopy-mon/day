@@ -3,14 +3,13 @@ package;
 import shadertoy.FlxShaderToyRuntimeShader;
 import flixel.FlxSprite;
 import flixel.FlxG;
-import flixel.text.FlxText;
-import flixel.graphics.FlxGraphic;
-import openfl.display.BitmapData;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tweens.FlxTween;
+import flixel.input.keyboard.FlxKey;
 import sys.io.File;
 
 class NewMenu extends MusicBeatState {
+    var debugKeys:Array<FlxKey>;
     var menuSpriteGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
     var menuSpriteSelectedGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
     var options:Array<String> = ["story mode", "extras", "options"];
@@ -25,6 +24,8 @@ class NewMenu extends MusicBeatState {
         var moopfg:FlxSprite = new FlxSprite(0, -360).loadGraphic(Paths.image("moopy/week1fg"), "shared");
         add(moopbg);
         add(moopfg);
+
+        debugKeys = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1'));
 
         for (i in 0...options.length) {
             var option:FlxSprite = new FlxSprite(-90, optionYs[i]);
@@ -69,9 +70,9 @@ class NewMenu extends MusicBeatState {
         if (controls.ACCEPT) go();
         #if cpp
         #if debug
-        if (FlxG.keys.anyJustPressed(MainMenuState.debugKeys))
+        if (FlxG.keys.anyJustPressed(debugKeys))
         {
-            MusicBeatState.switchState(new MasterEditorMenu());
+            MusicBeatState.switchState(new editors.MasterEditorMenu());
         }
         #end
         #end

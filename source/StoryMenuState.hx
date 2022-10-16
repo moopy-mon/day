@@ -144,7 +144,7 @@ class StoryMenuState extends MusicBeatState
 			PlayState.campaignScore = 0;
 			PlayState.campaignMisses = 0;
 			LoadingState.loadAndSwitchState(new PlayState(), true);
-			FreeplayState.destroyFreeplayVocals();
+			CustomWeekFreeplay.destroyFreeplayVocals();
 		} else {
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 		}
