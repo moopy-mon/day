@@ -38,6 +38,7 @@ class ClientPrefs {
 	public static var noteOffset:Int = 0;
 	public static var smJudges:Bool = false;
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
+	public static var pauseOnFocusLost:Bool = true;
 	public static var ghostTapping:Bool = true;
 	public static var timeBarType:String = 'SN and Time Left';
 	public static var scoreZoom:Bool = true;
@@ -137,6 +138,7 @@ class ClientPrefs {
 		FlxG.save.data.hitsoundVolume = hitsoundVolume;
 		FlxG.save.data.optimization = optimization;
 		FlxG.save.data.showScoreBar = showScoreBar;
+		FlxG.save.data.pauseOnFocusLost = pauseOnFocusLost;
 		FlxG.save.data.ignoreSkin = ignoreSkin;
 		FlxG.save.data.fpsPosition = fpsPosition;
 		FlxG.save.data.monoNotes = monoNotes;
@@ -205,6 +207,9 @@ class ClientPrefs {
 		}
 		if(FlxG.save.data.newTimeBar != null) {
 			newTimeBar = FlxG.save.data.newTimeBar;
+		}
+		if(FlxG.save.data.pauseOnFocusLost != null) {
+			pauseOnFocusLost = FlxG.save.data.pauseOnFocusLost;
 		}
 		if(FlxG.save.data.hitsoundVolume != null) {
 			hitsoundVolume = FlxG.save.data.hitsoundVolume;
