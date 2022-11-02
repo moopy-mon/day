@@ -10,6 +10,7 @@
     "graphicsOption": "Graphics",
     "visualsUIOption": "Visuals and UI",
     "gameplayOption": "Gameplay",
+	 "cachingOption": "Caching",
 
     "hueText": "Hue",
     "saturationText": "Saturation",

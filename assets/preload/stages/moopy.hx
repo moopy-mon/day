@@ -1,0 +1,20 @@
+import("sys.io.File");
+
+var shader = null;
+var bg:FlxSprite;
+var bg2:FlxSprite;
+
+function create():Void {
+    bg = new FlxSprite(-500, -100).loadGraphic(Paths.image("moopy/week1bg"));
+    fg = new FlxSprite(-500, -100).loadGraphic(Paths.image("moopy/week1fg"));
+    if (ClientPrefs.shaders) {
+        shader = new FlxShaderToyRuntimeShader(File.getContent("assets/shaders/titleScreen.frag"), bg.width, bg.height);
+        bg.shader = shader;
+    }
+    addBehindGF(bg);
+    addBehindGF(fg);
+}
+
+function update(elapsed:Float):Void {
+    if (shader != null) shader.update(elapsed);
+}
