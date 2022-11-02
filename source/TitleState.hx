@@ -90,6 +90,7 @@ class TitleState extends MusicBeatState
 	var titleJSON:TitleData;
 
 	public static var updateVersion:String = '';
+	public static var texts:Array<String> = [];
 
 	override public function create():Void
 	{
@@ -194,6 +195,8 @@ class TitleState extends MusicBeatState
 		}
 
 		FlxG.mouse.visible = false;
+		Locale.init();
+		texts = [Locale.get("introText1"), Locale.get("introText2"), Locale.get("introText3"), Locale.get("introText4")];
 		#if FREEPLAY
 		MusicBeatState.switchState(new FreeplayState());
 		#elseif CHARTING
@@ -580,7 +583,7 @@ class TitleState extends MusicBeatState
 					createCoolText(['Moopy', 'sayofthelor', "Req", "gemstonezVA", "and a ton more"]);
 				// credTextShit.visible = true;
 				case 3:
-					addMoreText('presents');
+					addMoreText(texts[1]);
 				// credTextShit.text += '\npresent...';
 				// credTextShit.addText();
 				// credTextShit.visible = false;

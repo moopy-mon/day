@@ -35,6 +35,7 @@ class Paths
 		'music',
 		'sounds',
 		'shaders',
+		'locale',
 		'videos',
 		'images',
 		'stages',
@@ -180,6 +181,10 @@ class Paths
 	{
 		return getPath('shaders/$key.vert', TEXT, library);
 	}
+	inline static public function localeFile(key:String, ?library:String)
+	{
+		return getPath('locale/$key/lang.json', TEXT, library);
+	}
 	inline static public function lua(key:String, ?library:String)
 	{
 		return getPath('$key.lua', TEXT, library);
@@ -235,9 +240,7 @@ class Paths
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
 	{
-		// streamlined the assets process more
-		var returnAsset:FlxGraphic = returnGraphic(key, library);
-		return returnAsset;
+		return returnGraphic(key, library);
 	}
 
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
@@ -437,6 +440,11 @@ class Paths
 	inline static public function modsTxt(key:String) {
 		return modFolders('images/' + key + '.txt');
 	}
+
+	inline static public function modsLocaleFile(key:String)
+		{
+			return modFolders('locale/$key/lang.json');
+		}
 
 	/* Goes unused for now
 
