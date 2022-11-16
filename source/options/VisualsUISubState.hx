@@ -54,7 +54,7 @@ class VisualsUISubState extends BaseOptionsMenu
 			false); //Default value
 		addOption(option);
 
-		var option:Option = new Option('StepMania Style Animations', //Name
+		var option:Option = new Option('StepMania Style Judgements', //Name
 			'If checked, StepMania style judgement animations will be used.', //Description
 			'smJudges', //Save data variable name
 			'bool', //Variable type
@@ -73,12 +73,23 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 2;
 		addOption(option);
 
+		var option:Option = new Option('Rating Position',
+			'Where the ratings are placed in the game.',
+			'ratingPosition',
+			'string',
+			'HUD',
+			['HUD', 'WORLD']
+		);
+		addOption(option);
+
+		#if !html5
 		var option:Option = new Option('Show Timing Counter',
 			'If checked, the timing (in ms) counter will be shown.',
 			'showMS',
 			'bool',
 			true);
 		addOption(option);
+		#end
 
 		var option:Option = new Option('Smaller Icons', //Name
 			'If checked, the health icons will be smaler on the health bar.', //Description
@@ -176,7 +187,7 @@ class VisualsUISubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
-		var option:Option = new Option('Info Display Pos: ',
+		var option:Option = new Option('Info Display Position: ',
 			"The position the Info Display is in.",
 			'fpsPosition',
 			'string',

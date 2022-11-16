@@ -8,6 +8,8 @@ import shadertoy.FlxShaderToyRuntimeShader;
 import hscript.Parser;
 import hscript.Interp;
 import hscript.Expr;
+import flixel.util.FlxDestroyUtil.IFlxDestroyable;
+import #if html5 lime.utils.Assets; #else sys.io.File; #end
 
 using StringTools;
 
@@ -26,14 +28,21 @@ using StringTools;
  */
  
 
-class FunkinHX  {
+class FunkinHX implements IFlxDestroyable {
     private var interp:Interp;
     public var scriptName:String = "unknown";
     public var loaded:Bool = false;
+    public var ignoreErrors:Bool = false;
+
+    public function destroy():Void {
+        interp = null;
+        scriptName = null;
+        loaded = false;
+    }
 
     public function traace(text:String):Void {
         var posInfo = interp.posInfos();
-        Sys.println("[interp:" + scriptName + ":" + posInfo.lineNumber + "]: " + text);
+        #if sys Sys.println #else js.Browser.console.log #end (scriptName + ":" + posInfo.lineNumber + ": " + text);
     }
 
     public function interpVarExists(k:String):Bool {
@@ -55,7 +64,7 @@ class FunkinHX  {
         scriptName = f;
         var ttr:String = null;
         if (type == FILE) {
-            ttr = sys.io.File.getContent(f);
+            ttr = #if sys File.getContent #else Assets.getText #end (f);
         } else if (type == STRING) {
             ttr = f;
         }
@@ -102,7 +111,6 @@ class FunkinHX  {
             interp.variables.set('ClientPrefs', ClientPrefs);
             interp.variables.set('Character', Character);
             interp.variables.set('Alphabet', Alphabet);
-            interp.variables.set('Http', sys.Http);
             interp.variables.set('Json', haxe.Json);
             #if !flash
             interp.variables.set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
@@ -152,7 +160,7 @@ class FunkinHX  {
             interp.variables.set("eventEarlyTrigger", function(eventName:String) {});
             interp.variables.set("onResume", function() {});
             interp.variables.set("onPause", function() {});
-            interp.variables.set("onSpawnNote", function(id:Int, direction:Int, type:String, isSustain:Bool) {});
+            interp.variables.set("onSpawnNote", function(note:Note) {});
             interp.variables.set("onGameOver", function() {});
             interp.variables.set("onEvent", function(name:String, val1:Dynamic, val2:Dynamic) {});
             interp.variables.set("onMoveCamera", function(char:String) {});
@@ -160,10 +168,11 @@ class FunkinHX  {
             interp.variables.set("onGhostTap", function(key:Int) {});
             interp.variables.set("onKeyPress", function(key:Int) {});
             interp.variables.set("onKeyRelease", function(key:Int) {});
-            interp.variables.set("noteMiss", function(id:Int, direction:Int, type:String, isSustain:Bool) {});
+            interp.variables.set("noteMiss", function(note:Note) {});
             interp.variables.set("noteMissPress", function(direction:Int) {});
-            interp.variables.set("opponentNoteHit", function(id:Int, direction:Int, type:String, isSustain:Bool) {});
-            interp.variables.set("goodNoteHit", function(id:Int, direction:Int, type:String, isSustain:Bool) {});
+            interp.variables.set("opponentNoteHit", function(note:Note) {});
+            interp.variables.set("goodNoteHit", function(note:Note) {});
+            interp.variables.set("noteHit", function(note:Note) {});
             interp.variables.set("stepHit", function() {});
             interp.variables.set("beatHit", function() {});
             interp.variables.set("sectionHit", function() {});
@@ -171,9 +180,14 @@ class FunkinHX  {
             interp.variables.set("Function_Stop", FunkinLua.Function_Stop);
             interp.variables.set("onIconUpdate", function(p:String) {});
             interp.variables.set("onHeadBop", function(name:String) {});
+            interp.variables.set("onGameOverStart", function() {});
+            interp.variables.set("onGameOverConfirm", function() {});
             interp.variables.set("Std", Std);
             interp.variables.set("WinAPI", WinAPI);
             interp.variables.set("script", this);
+            interp.variables.set("destroy", function() {});
+            interp.variables.set("Note", Note);
+            interp.variables.set("trace", traace);
 
             if (ttr != null) try {
                 interp.execute(getExprFromString(ttr, true));
@@ -181,6 +195,7 @@ class FunkinHX  {
                 loaded = true;
             } catch (e:Dynamic) traace('$e');
     }
+
 
     public static function getExprFromString(code:String, critical:Bool = false, ?path:String):Expr
         {
@@ -228,7 +243,7 @@ class FunkinHX  {
                     trace('$f exists, but is not a function!');
                     return null;
                 }
-            } catch (e:Dynamic) openfl.Lib.application.window.alert('Error with script: ' + scriptName + ' at line ' + interp.posInfos().lineNumber + ":\n" + e, 'Haxe script error');
+            } catch (e:Dynamic) if (!ignoreErrors) openfl.Lib.application.window.alert('Error with script: ' + scriptName + ' at line ' + interp.posInfos().lineNumber + ":\n" + e, 'Haxe script error');
             trace('$f does not exist!');
             return null;
         }

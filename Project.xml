@@ -53,6 +53,7 @@
 	<define name="TITLE_SCREEN_EASTER_EGG" if="officialBuild"/> <!-- DELETE THE if="officialBuild" for enabling this on an unofficial build -->
 	<define name="CRASH_HANDLER" if="desktop release" />
 
+	<assets path="assets/locale" />W
 	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3"  unless="web"/>
 	<section if="TITLE_SCREEN_EASTER_EGG">
@@ -107,7 +108,6 @@
 	<assets path="assets/week6"         library="week6"         exclude="*.mp3" unless="web"/>
 	<assets path="assets/week7"         library="week7"         exclude="*.ogg" if="web"/>
 	<assets path="assets/week7"         library="week7"         exclude="*.mp3" unless="web"/>
-
 	
 	<section if="MODS_ALLOWED">
 		<assets path='example_mods' rename='mods' embed='false'/>
@@ -147,6 +147,23 @@
 	<haxelib name="systools" />
 	<ndll name="systools" haxelib="systools" />
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
+	
+	<haxeflag name="-dce" value="no" />
+	<haxeflag name="--macro" value="include('sys')" unless="html5"/>
+	<!-- <haxeflag name="macro" value="include('openfl')" /> -->
+	<haxeflag name="--macro" value="include('flixel.animation')" />
+	<haxeflag name="--macro" value="include('flixel.effects')" />
+	<haxeflag name="--macro" value="include('flixel.graphics')" />
+	<haxeflag name="--macro" value="include('flixel.group')" />
+	<haxeflag name="--macro" value="include('flixel.input')" />
+	<haxeflag name="--macro" value="include('flixel.math')" />
+	<haxeflag name="--macro" value="include('flixel.path')" />
+	<haxeflag name="--macro" value="include('flixel.system')" unless="html5" />
+	<haxeflag name="--macro" value="include('flixel.text')" />
+	<haxeflag name="--macro" value="include('flixel.tile')" />
+	<haxeflag name="--macro" value="include('flixel.tweens')" />
+	<haxeflag name="--macro" value="include('flixel.ui')" />
+	<haxeflag name="--macro" value="include('flixel.util')" />
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
@@ -206,7 +223,6 @@
 	<section if="buildcrash">
 		<postbuild cmd="build-crash-dialog.bat" if="windows" />
 		<postbuild cmd="./build-crash-dialog.sh" if="linux" />
-		<postbuild cmd="./build-crash-dialog-mac.sh" if="mac" />
 	</section>
 
 	<!-- _________________________________ Custom _______________________________ -->
