@@ -56,6 +56,9 @@ jobs:
           haxelib install haxeui-core
           haxelib install haxeui-openfl
           haxelib git FlashCache http://github.com/sayofthelor/FlashCache
+          haxelib git tentools https://github.com/TentaRJ/tentools.git
+          haxelib git systools https://github.com/haya3218/systools
+          haxelib run lime rebuild systools linux
           haxelib list
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
@@ -101,6 +104,9 @@ jobs:
           haxelib install haxeui-core
           haxelib install haxeui-openfl
           haxelib git FlashCache http://github.com/sayofthelor/FlashCache
+          haxelib git tentools https://github.com/TentaRJ/tentools.git
+          haxelib git systools https://github.com/haya3218/systools
+          haxelib run lime rebuild systools windows
           haxelib list
         shell: cmd
       - name: Create Version Tag
@@ -147,6 +153,9 @@ jobs:
           haxelib install haxeui-core
           haxelib install haxeui-openfl
           haxelib git FlashCache http://github.com/sayofthelor/FlashCache
+          haxelib git tentools https://github.com/TentaRJ/tentools.git
+          haxelib git systools https://github.com/haya3218/systools
+          haxelib run lime rebuild systools mac
           haxelib list
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
