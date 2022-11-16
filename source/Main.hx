@@ -27,6 +27,7 @@ import sys.Http;
 import sys.FileSystem;
 import sys.io.File;
 #end
+import GameJolt;
 class Main extends Sprite
 {
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
@@ -39,6 +40,7 @@ class Main extends Sprite
 	public static var fpsVar:lore.FPS;
 	public static var instance:Main;
 	public var game:FlxGame;
+	public static var gjToastManager:GJToastManager;
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
 	public static function main():Void
@@ -107,6 +109,10 @@ class Main extends Sprite
 		FlxG.autoPause = false;
 		FlxG.mouse.visible = false;
 		#end
+		gjToastManager = new GJToastManager();
+		addChild(gjToastManager);
+		
+		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 	}
 
 	#if desktop

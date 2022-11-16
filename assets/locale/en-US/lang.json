@@ -10,7 +10,11 @@
     "graphicsOption": "Graphics",
     "visualsUIOption": "Visuals and UI",
     "gameplayOption": "Gameplay",
-	 "cachingOption": "Caching",
+	"cachingOption": "Caching",
+    "GJOption": "GameJolt Options",
+
+    "GJLoginOption": "Login",
+    "GJSavesOption": "Cloud Saves",
 
     "notesNCOText": "NOTES",
     "uiNCOText": "UI",

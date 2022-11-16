@@ -242,6 +242,8 @@ class TitleState extends MusicBeatState
 	{
 		if (!initialized)
 		{
+			GameJolt.GameJoltAPI.connect();
+            GameJolt.GameJoltAPI.authDaUser(FlxG.save.data.gjUser, FlxG.save.data.gjToken);
 			/*var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
 			diamond.persist = true;
 			diamond.destroyOnNoUse = false;

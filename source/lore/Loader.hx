@@ -172,6 +172,7 @@ class Loader extends FlxState {
     override public function update(elapsed:Float):Void {
         super.update(elapsed);
         if (completelyCached) {
+            completelyCached = false; // prevent it from running 49023095832908423 times
             FlxG.switchState(new TitleState());
         }
     }

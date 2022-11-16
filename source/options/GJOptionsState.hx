@@ -28,7 +28,7 @@ import Controls;
 
 using StringTools;
 
-class OptionsState extends MusicBeatState
+class GJOptionsState extends MusicBeatState
 {
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Substate_Checker'), 0.2, 0.2, true, true);
 	public static var checkerX:Float = 0;
@@ -47,22 +47,15 @@ class OptionsState extends MusicBeatState
 	var selectorRight:Alphabet;
 
 	override function create() {
-		options = [Locale.get("noteColorsOption"), Locale.get("controlsOption"), Locale.get("delayOption"), Locale.get("graphicsOption"), Locale.get("visualsUIOption"), Locale.get("gameplayOption"), Locale.get("cachingOption"), Locale.get("GJOption")];
+		options = [Locale.get("GJLoginOption"), Locale.get("GJSavesOption")];
 		things = [
-			options[0] => function() openSubState(new options.NotesSubState()),
-			options[1] => function() openSubState(new options.ControlsSubState()),
-			options[2] => function() LoadingState.loadAndSwitchState(new options.NoteOffsetState()),
-			options[3] => function() openSubState(new options.GraphicsSettingsSubState()),
-			options[4] => function() openSubState(new options.VisualsUISubState()),
-			options[5] => function() openSubState(new options.GameplaySettingsSubState()),
-			options[6] => function() openSubState(new options.CachingSettingsSubState()),
-			options[7] => function() LoadingState.loadAndSwitchState(new options.GJOptionsState())
+			options[0] => function() LoadingState.loadAndSwitchState(new GameJolt.GameJoltLogin()),
+			options[1] => function() openSubState(new options.ControlsSubState())
 		];
 		#if desktop
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 
-		FlxG.sound.playMusic(Paths.music('Options'));
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xffCCCCCC;
 		bg.updateHitbox();
@@ -117,8 +110,7 @@ class OptionsState extends MusicBeatState
 
 		if (controls.BACK) {
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			MusicBeatState.switchState(new NewMenu());
+			MusicBeatState.switchState(new options.OptionsState());
 		}
 
 		if (controls.ACCEPT) {

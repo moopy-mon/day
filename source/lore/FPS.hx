@@ -6,6 +6,7 @@ import flixel.FlxG;
 import openfl.Lib;
 import openfl.system.System;
 import flixel.math.FlxMath;
+import flixel.util.FlxTimer;
 
 using StringTools;
 
@@ -50,7 +51,10 @@ class FPS extends TextField
 	{
 		super();
 
-		var defText = "0 FPS\nMemory: 0 MB\nLore v" + MainMenuState.loreEngineVersion + MainMenuState.versionSuffix;
+		var defText = 
+		(ClientPrefs.showFPSNum ? "0 FPS" : "") +
+		(ClientPrefs.showMem ? "\nMemory: 0 MB" : "") +
+		(ClientPrefs.showLore ? "\nLore v" + MainMenuState.loreEngineVersion + MainMenuState.versionSuffix : "");
 
 		this.x = x;
 		width = FlxG.width;
@@ -136,6 +140,7 @@ class FPS extends TextField
 		currentTime = 0;
 		times = [];
 		updatePos();
+		new FlxTimer().start(0.05, (t) -> updatePos());
 	}
 
 	// Event Handlers

@@ -58,6 +58,14 @@ class NewMenu extends MusicBeatState {
         super.create();
     }
     override public function update(elapsed:Float) {
+        if (FlxG.keys.justPressed.NUMPADSEVEN) CloudSaves.sendScores();
+        if (FlxG.keys.justPressed.NUMPADEIGHT) CloudSaves.getScores();
+        if (FlxG.keys.justPressed.NUMPADNINE) {
+            FlxG.save.erase();
+            FlxG.save.flush();
+            FlxG.save.close();
+            FlxG.resetGame();
+        }
         if (s != null && s is FlxShaderToyRuntimeShader) {
             s.update(elapsed, null);
         }
