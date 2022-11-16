@@ -8,13 +8,13 @@ lime test [platform] -final -Dbuildcrash
 ```
 You need to install the git version of FlashCache to compile the game, to do this run:
 
-```
+```sh
 haxelib git FlashCache https://github.com/sayofthelor/FlashCache
 ```
 
 You also need to run these:
 
-```
+```sh
 haxelib git tentools https://github.com/TentaRJ/tentools.git
 haxelib git systools https://github.com/haya3218/systools
 haxelib run lime rebuild systools [platform]
@@ -22,7 +22,7 @@ haxelib run lime rebuild systools [platform]
 
 You'll need to make a file called `GJKeys.hx` in the `source` folder with this in it:
 
-```
+```haxe
 final id:Int = 0;
 final key:String = ""
 ```
