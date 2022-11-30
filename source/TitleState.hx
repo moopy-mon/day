@@ -240,6 +240,8 @@ class TitleState extends MusicBeatState
 
 	function startIntro()
 	{
+		Main.fpsVar.updatePos();
+		Main.fpsVar.set_rainbowEnabled(ClientPrefs.rainbowFPS);
 		if (!initialized)
 		{
 			GameJolt.GameJoltAPI.connect();

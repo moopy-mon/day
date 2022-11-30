@@ -215,7 +215,12 @@ class PlayState extends MusicBeatState
 	public var healthGain:Float = 1;
 	public var healthLoss:Float = 1;
 	public var instakillOnMiss:Bool = false;
-	public var cpuControlled:Bool = false;
+	public var cpuControlled(default, set):Bool = false;
+	public function set_cpuControlled(v:Bool):Bool {
+		cpuControlled = v;
+		updateScore(false, true);
+		return v;
+	}
 	public var practiceMode:Bool = false;
 
 
@@ -276,7 +281,7 @@ class PlayState extends MusicBeatState
 	public var songScore:Int = 0;
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
-	public var scoreTxt:FlxText;
+	public var scoreTxt:FlxText = null;
 	var timeTxt:FlxText;
 	var scoreTxtTween:FlxTween;
 
@@ -2500,51 +2505,55 @@ class PlayState extends MusicBeatState
 
 	public var scoreColTween:FlxTween = null;
 
-	public function updateScore(miss:Bool = false)
+	public function updateScore(miss:Bool = false, ?cpuUpdate:Bool = false)
 	{
-		if (cpuControlled) {
-			scoreTxt.text = "Botplay Enabled \\ Score Not Counted";
-		} else if(ratingName == '?') {
-			scoreTxt.text = 'Score: ' + songScore + ' \\ Combo Breaks: ' + songMisses + ' \\ Accuracy: 0% [' + ratingName + ']';
-		} else {
-			scoreTxt.text = 'Score: ' + songScore + ' \\ Combo Breaks: ' + songMisses + ' \\ Accuracy: ' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%' + ' [' + ratingName + ' | ' + ratingFC + ']';//peeps wanted no integer rating
-		}
+		if (scoreTxt != null) {
+			if (cpuControlled) {
+				scoreTxt.text = "Botplay Enabled \\ Score Not Counted";
+			} else if(ratingName == '?' && !cpuUpdate) {
+				scoreTxt.text = 'Score: ' + songScore + ' \\ Combo Breaks: ' + songMisses + ' \\ Accuracy: 0% [' + ratingName + ']';
+			} else if (!cpuUpdate) {
+				scoreTxt.text = 'Score: ' + songScore + ' \\ Combo Breaks: ' + songMisses + ' \\ Accuracy: ' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%' + ' [' + ratingName + ' | ' + ratingFC + ']';//peeps wanted no integer rating
+			}
 
-		if(ClientPrefs.scoreZoom && !miss && !cpuControlled)
-		{
-			if(scoreTxtTween != null) {
-				scoreTxtTween.cancel();
-			}
-			scoreTxt.scale.x = 1.075;
-			scoreTxt.scale.y = 1.075;
-			scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
-				onComplete: function(twn:FlxTween) {
-					scoreTxtTween = null;
+			if(ClientPrefs.scoreZoom && !miss && !cpuControlled && !cpuUpdate)
+			{
+				if(scoreTxtTween != null) {
+					scoreTxtTween.cancel();
 				}
-			});
-		} else if (ClientPrefs.scoreZoom && miss && !cpuControlled) {
-			if(scoreTxtTween != null) {
-				scoreTxtTween.cancel();
-			}
-			if (scoreColTween != null) {
-				scoreColTween.cancel();
-			}
-			scoreTxt.scale.x = 0.925;
-			scoreTxt.scale.y = 0.925;
-			scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
-				onComplete: function(twn:FlxTween) {
-					scoreTxtTween = null;
+				scoreTxt.scale.x = 1.075;
+				scoreTxt.scale.y = 1.075;
+				scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
+					onComplete: function(twn:FlxTween) {
+						scoreTxtTween = null;
+					}
+				});
+			} else if (ClientPrefs.scoreZoom && miss && !cpuControlled && !cpuUpdate) {
+				if(scoreTxtTween != null) {
+					scoreTxtTween.cancel();
 				}
-			});
-			scoreTxt.color = 0xFFFF0000;
-			scoreColTween = FlxTween.color(scoreTxt, 0.2, 0xFFFF0000, 0xFFFFFFFF, {
-				onComplete: function(twn:FlxTween) {
-					scoreColTween = null;
+				if (scoreColTween != null) {
+					scoreColTween.cancel();
 				}
-			});
+				scoreTxt.scale.x = 0.925;
+				scoreTxt.scale.y = 0.925;
+				scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
+					onComplete: function(twn:FlxTween) {
+						scoreTxtTween = null;
+					}
+				});
+				scoreTxt.color = 0xFFFF0000;
+				scoreColTween = FlxTween.color(scoreTxt, 0.2, 0xFFFF0000, 0xFFFFFFFF, {
+					onComplete: function(twn:FlxTween) {
+						scoreColTween = null;
+					}
+				});
+			}
+			if (!cpuUpdate) {
+				callOnLuas('onUpdateScore', [miss]);
+				callOnHaxes('onUpdateScore', [miss]);
+			}
 		}
-		callOnLuas('onUpdateScore', [miss]);
-		callOnHaxes('onUpdateScore', [miss]);
 	}
 
 	public function setSongTime(time:Float)
@@ -2601,12 +2610,13 @@ class PlayState extends MusicBeatState
 			iconP2.bopIcon(ClientPrefs.bopStyle == "LORE", "dad");
 		}
 		if (camZooming) {
-			FlxG.camera.zoom += 0.015 * camZoomingMult;
+			FlxG.camera.zoom += (0.015 / defaultCamZoom) * camZoomingMult;
 			camHUD.zoom += 0.03 * camZoomingMult;
 		}
 
 		FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 		FlxG.sound.music.pitch = playbackRate;
+		set_playbackRate(playbackRate); // fixes finishSong bug i'm pretty sure
 		FlxG.sound.music.onComplete = finishSong.bind();
 		vocals.play();
 		vocals2.play();
