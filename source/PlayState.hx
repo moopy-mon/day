@@ -4563,19 +4563,6 @@ class PlayState extends MusicBeatState
 		});
 		#end
 		
-		comboSpr = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
-		if (ClientPrefs.ratingPosition == "HUD") comboSpr.cameras = [camHUD];
-		comboSpr.screenCenter();
-		comboSpr.x = coolText.x;
-		if(!ClientPrefs.smJudges) {
-		comboSpr.acceleration.y = 600;
-		comboSpr.velocity.y -= 150;
-		}
-		comboSpr.visible = (!ClientPrefs.hideHud && showCombo);
-		comboSpr.x += ClientPrefs.comboOffset[0];
-		comboSpr.y -= ClientPrefs.comboOffset[1];
-		comboSpr.y += 60;
-		comboSpr.velocity.x += FlxG.random.int(1, 10);
 		remove(rating);
 		add(rating);
 
