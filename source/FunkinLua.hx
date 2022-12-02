@@ -1098,7 +1098,7 @@ class FunkinLua {
 		});
 
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String) {
-			if (lore.FunkinHX.denyList.contains(classVar)) return;
+			if (lore.FunkinHX.denyList.contains(classVar)) return null;
 			@:privateAccess
 			var killMe:Array<String> = variable.split('.');
 			if(killMe.length > 1) {
@@ -1111,7 +1111,7 @@ class FunkinLua {
 			return getVarInArray(Type.resolveClass(classVar), variable);
 		});
 		Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic) {
-			if (lore.FunkinHX.denyList.contains(classVar)) return;
+			if (lore.FunkinHX.denyList.contains(classVar)) return false;
 			@:privateAccess
 			var killMe:Array<String> = variable.split('.');
 			if(killMe.length > 1) {
