@@ -33,6 +33,7 @@ class FunkinHX implements IFlxDestroyable {
     public var scriptName:String = "unknown";
     public var loaded:Bool = false;
     public var ignoreErrors:Bool = false;
+    public static final denyList:haxe.ds.ReadOnlyArray<String> = ["Highscore", "Reflect", "GJKeys"];
 
     public function destroy():Void {
         interp = null;
@@ -71,6 +72,7 @@ class FunkinHX implements IFlxDestroyable {
         interp = new Interp();
         interp.variables.set("import", function(className:String)
             {
+                if (denyList.contains(className)) return;
                 var splitClassName = [for (e in className.split(".")) e.trim()];
                 var realClassName = splitClassName.join(".");
                 var cl = Type.resolveClass(realClassName);
