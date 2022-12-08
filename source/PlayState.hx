@@ -92,7 +92,7 @@ class PlayState extends MusicBeatState
 	public static var STRUM_X_MIDDLESCROLL = -278;
 	public var laneunderlay:FlxSprite;
 	public static var ratingStuff:Array<Dynamic> = [
-		['You Suck!', 0.46], // 0 to 45
+		['Uninstall.', 0.46], // 0 to 45
 		['F', 0.51], // 45 to F50
 		['D-', 0.56], // 50 to 55
 		['D', 0.59], // 55 to 58
