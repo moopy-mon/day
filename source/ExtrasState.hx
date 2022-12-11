@@ -31,7 +31,11 @@ using StringTools;
 
 class ExtrasState extends MusicBeatState
 {
+	#if (flixel_addons < "3.0.0")
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Substate_Checker'), 0.2, 0.2, true, true);
+	#else
+	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Substate_Checker'));
+	#end
 	public static var checkerX:Float = 0;
 	public static var checkerY:Float = 0;
 	var options:Array<String> = ['Main Story', 'Rivals', 'Misc'];
@@ -55,6 +59,9 @@ class ExtrasState extends MusicBeatState
 	var selectorRight:Alphabet;
 
 	override function create() {
+		#if (flixel_addons < "3.0.0")
+		checker.scrollFactor.set(0.2, 0.2);
+		#end
 		#if desktop
 		DiscordClient.changePresence("In the Extras menu", null);
 		#end

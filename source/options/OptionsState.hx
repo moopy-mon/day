@@ -54,7 +54,7 @@ class OptionsState extends MusicBeatState
 		#if (flixel_addons < "3.0.0")
 		checker.scrollFactor.set(0.2, 0.2);
 		#end
-		options = [Locale.get("noteColorsOption"), Locale.get("controlsOption"), Locale.get("delayOption"), Locale.get("graphicsOption"), Locale.get("visualsUIOption"), Locale.get("gameplayOption")];
+		options = [Locale.get("noteColorsOption"), Locale.get("controlsOption"), Locale.get("delayOption"), Locale.get("graphicsOption"), Locale.get("visualsUIOption"), Locale.get("gameplayOption"), Locale.get("cachingOption")];
 		things = [
 			options[0] => function() openSubState(new options.NotesSubState()),
 			options[1] => function() openSubState(new options.ControlsSubState()),

@@ -30,7 +30,11 @@ using StringTools;
 
 class GJOptionsState extends MusicBeatState
 {
+	#if (flixel_addons < "3.0.0")
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Substate_Checker'), 0.2, 0.2, true, true);
+	#else
+	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Substate_Checker'));
+	#end
 	public static var checkerX:Float = 0;
 	public static var checkerY:Float = 0;
 	static var options:Array<String>;
@@ -47,6 +51,9 @@ class GJOptionsState extends MusicBeatState
 	var selectorRight:Alphabet;
 
 	override function create() {
+		#if (flixel_addons < "3.0.0")
+		checker.scrollFactor.set(0.2, 0.2);
+		#end
 		options = [Locale.get("GJLoginOption"), Locale.get("GJSavesOption")];
 		things = [
 			options[0] => function() LoadingState.loadAndSwitchState(new GameJolt.GameJoltLogin()),
