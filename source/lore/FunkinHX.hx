@@ -1,24 +1,19 @@
 package lore;
 
-import lime.app.Application;
-import lime.*;
-import openfl.*;
-import flixel.*;
 import shadertoy.FlxShaderToyRuntimeShader;
 import hscript.Parser;
 import hscript.Interp;
 import hscript.Expr;
 import flixel.util.FlxDestroyUtil.IFlxDestroyable;
 import #if html5 lime.utils.Assets; #else sys.io.File; #end
+#if sys import flixel.system.macros.FlxMacroUtil; #end
 
 using StringTools;
 
 /**
  * This is where all of the hscript stuff that isn't for FunkinLua is.
  * 
- * You can find all of that stuff in FunkinLua.HScript.
- * 
- * FunkinLua.HScript is used here to steal a bunch of variable setting I don't wanna do again.
+ * You can find all of that stuff in FunkinLua.HScript.\
  * 
  * getExprFromString and the import code (as well as the inspiration for this file in general) is owed to YoshiCrafter29.
  * 
@@ -29,12 +24,21 @@ using StringTools;
  
 
 class FunkinHX implements IFlxDestroyable {
+    private static var possiblyMaliciousCode(default, null):Array<String> = [
+        "@:privateAccess",
+        "ClientPrefs.aspectRatio",
+        "Highscore",
+        "Process",
+        "Sys.command",
+        "Reflect"
+    ];
     private var interp:Interp;
     public var scriptName:String = "unknown";
     public var scriptType:FunkinHXType = NOEXEC;
     public var loaded:Bool = false;
     public var ignoreErrors:Bool = false;
     public static final denyList:haxe.ds.ReadOnlyArray<String> = ["Highscore", "Reflect", "GJKeys"];
+    public static final println:String->Void = #if sys Sys.println #elseif js (untyped console).log #end;
 
     public function destroy():Void {
         interp = null;
@@ -44,7 +48,7 @@ class FunkinHX implements IFlxDestroyable {
 
     public function traace(text:String):Void {
         var posInfo = interp.posInfos();
-        #if sys Sys.println #else js.Browser.console.log #end (scriptName + ":" + posInfo.lineNumber + ": " + text);
+        println(scriptName + ":" + posInfo.lineNumber + ": " + text);
     }
 
     public function interpVarExists(k:String):Bool {
@@ -53,16 +57,20 @@ class FunkinHX implements IFlxDestroyable {
         }
         return false;
     }
-    public function setInterpVariable(k:String, v:Dynamic):Void {
+    public function set(k:String, v:Dynamic):Void {
         if (interp != null) interp.variables.set(k, v);
     }
 
-    public function getInterpVariable(k:String):Dynamic {
+    public function get(k:String):Dynamic {
         if (interp != null) return interp.variables.get(k);
         return null;
     }
 
-    public function new(f:String, ?type:FunkinHXType = FILE):Void {
+    public function remove(k:String):Void {
+        if (interp != null) interp.variables.remove(k);
+    }
+
+    public function new(f:String, ?primer:FunkinHX->Void = null, ?type:FunkinHXType = FILE):Void {
         scriptName = f;
         scriptType = type;
         var ttr:String = null;
@@ -71,75 +79,68 @@ class FunkinHX implements IFlxDestroyable {
         } else if (type == STRING) {
             ttr = f;
         }
+        var tempBuf = new StringBuf();
+        var tempArray = ttr.split("\n");
+        var maliciousLines = [];
+        if (tempArray[0].contains("package;")) tempArray.remove(tempArray[0]); // haven't figured out how to fix in hscript-lore so keeping this here for now
+        for (i in 0...tempArray.length) {
+            for (e in possiblyMaliciousCode) if (tempArray[i].contains(e)) {
+                maliciousLines.push('Line ${i+1}: ${tempArray[i]}');
+            }
+        }
+        if (maliciousLines.length > 0) {
+            var alertText:String = 'Th${maliciousLines.length == 1 ? "is line" : "ese lines"} of code are potentially malicious:\n\n{lines}\n\nWould you like to continue executing the script?'; 
+            alertText = alertText.replace("{lines}", maliciousLines.join("\n"));
+            var confirmation = WinAPI.messageBoxYN(alertText, 'Potentially malicious code detected');
+            if (!confirmation) {
+                destroy();
+                return;
+            }
+        }
+        for (i in tempArray) tempBuf.add(i + "\n");
+        ttr = tempBuf.toString();
         interp = new Interp();
-        interp.variables.set("import", function(className:String)
-            {
-                if (denyList.contains(className)) return;
-                var splitClassName = [for (e in className.split(".")) e.trim()];
-                if (interp.variables.exists(splitClassName[splitClassName.length - 1])) return;
-                var realClassName = splitClassName.join(".");
-                var cl = Type.resolveClass(realClassName);
-                var en = Type.resolveEnum(realClassName);
-                if (cl == null && en == null)
-                {
-                    openfl.Lib.application.window.alert('Class / Enum at $realClassName does not exist.', 'Haxe script error');
-                }
-                else
-                {
-                    if (en != null)
-                    {
-                        // ENUM!!!!
-                        var enumThingy = {};
-                        for (c in en.getConstructors())
-                        {
-                            Reflect.setField(enumThingy, c, en.createByName(c));
-                        }
-                        interp.variables.set(splitClassName[splitClassName.length - 1], enumThingy);
-                    }
-                    else
-                    {
-                        // CLASS!!!!
-                        interp.variables.set(splitClassName[splitClassName.length - 1], cl);
-                    }
-                }
-            });
-            interp.variables.set('FlxG', flixel.FlxG);
-            interp.variables.set('FlxSprite', flixel.FlxSprite);
-            interp.variables.set('FlxCamera', flixel.FlxCamera);
-            interp.variables.set('FlxTimer', flixel.util.FlxTimer);
-            interp.variables.set('FlxTween', flixel.tweens.FlxTween);
-            interp.variables.set('FlxEase', flixel.tweens.FlxEase);
-            interp.variables.set('FlxText', flixel.text.FlxText);
-            interp.variables.set('PlayState', PlayState);
-            interp.variables.set('game', PlayState.instance);
-            interp.variables.set('Paths', Paths);
-            interp.variables.set('Conductor', Conductor);
-            interp.variables.set('ClientPrefs', ClientPrefs);
-            interp.variables.set('Character', Character);
-            interp.variables.set('Alphabet', Alphabet);
-            interp.variables.set('PauseSubState', PauseSubState);
-            interp.variables.set('Json', haxe.Json);
-            interp.variables.set("curBeat", 0);
-            interp.variables.set("curStep", 0);
-            interp.variables.set("curSection", 0);
+            set("DiscordClient", Discord.DiscordClient);
+            set('preloadImage', (s:String) -> Paths.image(s));
+            set('preloadSound', (s:String) -> Paths.sound(s));
+            set('preloadMusic', (s:String) -> Paths.music(s));
+            set('FlxG', flixel.FlxG);
+            set('FlxSprite', flixel.FlxSprite);
+            set('FlxCamera', flixel.FlxCamera);
+            set('FlxTimer', flixel.util.FlxTimer);
+            set('FlxTween', flixel.tweens.FlxTween);
+            set('FlxEase', flixel.tweens.FlxEase);
+            set('FlxText', flixel.text.FlxText);
+            set('PlayState', PlayState);
+            set('game', PlayState.instance);
+            set('Paths', Paths);
+            set('Conductor', Conductor);
+            set('ClientPrefs', ClientPrefs);
+            set('Character', Character);
+            set('Alphabet', Alphabet);
+            set('PauseSubState', PauseSubState);
+            set('Json', haxe.Json);
+            set("curBeat", 0);
+            set("curStep", 0);
+            set("curSection", 0);
             #if !flash
-            interp.variables.set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
-            interp.variables.set('FlxShaderToyRuntimeShader', FlxShaderToyRuntimeShader);
-            interp.variables.set('ShaderFilter', openfl.filters.ShaderFilter);
+            set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
+            set('FlxShaderToyRuntimeShader', FlxShaderToyRuntimeShader);
+            set('ShaderFilter', openfl.filters.ShaderFilter);
             #end
-            interp.variables.set('StringTools', StringTools);
+            set('StringTools', StringTools);
     
-            interp.variables.set('setVar', function(name:String, value:Dynamic)
+            set('setVar', function(name:String, value:Dynamic)
             {
                 PlayState.instance.variables.set(name, value);
             });
-            interp.variables.set('getVar', function(name:String)
+            set('getVar', function(name:String)
             {
                 var result:Dynamic = null;
                 if(PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
                 return result;
             });
-            interp.variables.set('removeVar', function(name:String)
+            set('removeVar', function(name:String)
             {
                 if(PlayState.instance.variables.exists(name))
                 {
@@ -148,66 +149,75 @@ class FunkinHX implements IFlxDestroyable {
                 }
                 return false;
             });
-            interp.variables.set("Sys", Sys);
-            if (PlayState.instance != null) {
-                interp.variables.set("add", PlayState.instance.add);
-                interp.variables.set("addBehindDad", PlayState.instance.addBehindDad);
-                interp.variables.set("addBehindGF", PlayState.instance.addBehindGF);
-                interp.variables.set("addBehindBF", PlayState.instance.addBehindBF);
-                interp.variables.set("remove", PlayState.instance.remove);
-                interp.variables.set("insert", PlayState.instance.insert);
-                interp.variables.set("indexOf", PlayState.instance.members.indexOf);
+            set("Sys", Sys);
+            if (PlayState.inPlayState) {
+                set("add", PlayState.instance.add);
+                set("addBehindDad", PlayState.instance.addBehindDad);
+                set("addBehindGF", PlayState.instance.addBehindGF);
+                set("addBehindBF", PlayState.instance.addBehindBF);
+                set("remove", PlayState.instance.remove);
+                set("insert", PlayState.instance.insert);
+                set("indexOf", PlayState.instance.members.indexOf);
+                set("openSubState", PlayState.instance.openSubState);
             }
-            interp.variables.set("create", function() {});
-            interp.variables.set("createPost", function() {});
-            interp.variables.set("update", function(elapsed:Float) {});
-            interp.variables.set("updatePost", function(elapsed:Float) {});
-            interp.variables.set("startCountdown", function() {});
-            interp.variables.set("onCountdownStarted", function() {});
-            interp.variables.set("onCountdownTick", function(tick:Int) {});
-            interp.variables.set("onUpdateScore", function(miss:Bool) {});
-            interp.variables.set("onNextDialogue", function(counter:Int) {});
-            interp.variables.set("onSkipDialogue", function() {});
-            interp.variables.set("onSongStart", function() {});
-            interp.variables.set("eventEarlyTrigger", function(eventName:String) {});
-            interp.variables.set("onResume", function() {});
-            interp.variables.set("onPause", function() {});
-            interp.variables.set("onSpawnNote", function(note:Note) {});
-            interp.variables.set("onGameOver", function() {});
-            interp.variables.set("onEvent", function(name:String, val1:Dynamic, val2:Dynamic) {});
-            interp.variables.set("onMoveCamera", function(char:String) {});
-            interp.variables.set("onEndSong", function() {});
-            interp.variables.set("onGhostTap", function(key:Int) {});
-            interp.variables.set("onKeyPress", function(key:Int) {});
-            interp.variables.set("onKeyRelease", function(key:Int) {});
-            interp.variables.set("noteMiss", function(note:Note) {});
-            interp.variables.set("noteMissPress", function(direction:Int) {});
-            interp.variables.set("opponentNoteHit", function(note:Note) {});
-            interp.variables.set("goodNoteHit", function(note:Note) {});
-            interp.variables.set("noteHit", function(note:Note) {});
-            interp.variables.set("stepHit", function() {});
-            interp.variables.set("beatHit", function() {});
-            interp.variables.set("sectionHit", function() {});
-            interp.variables.set("onRecalculateRating", function() {});
-            interp.variables.set("Function_Stop", FunkinLua.Function_Stop);
-            interp.variables.set("onIconUpdate", function(p:String) {});
-            interp.variables.set("onHeadBop", function(name:String) {});
-            interp.variables.set("onGameOverStart", function() {});
-            interp.variables.set("onGameOverConfirm", function() {});
-            interp.variables.set("onPauseMenuSelect", function(name:String) {});
-            interp.variables.set("onOpenPauseMenu", function() {});
-            interp.variables.set("Std", Std);
-            interp.variables.set("WinAPI", WinAPI);
-            interp.variables.set("script", this);
-            interp.variables.set("destroy", function() {});
-            interp.variables.set("Note", Note);
-            interp.variables.set("trace", traace);
-            interp.variables.set("X", flixel.util.FlxAxes.X);
-            interp.variables.set("Y", flixel.util.FlxAxes.Y);
-            interp.variables.set("XY", flixel.util.FlxAxes.XY);
-            interp.variables.set("FlxAxes", {X: flixel.util.FlxAxes.X, Y: flixel.util.FlxAxes.Y, XY: flixel.util.FlxAxes.XY});
-            interp.variables.set("switchState", MusicBeatState.switchState);
-            interp.variables.set("ScriptedState", ScriptedState);
+            set("create", function() {});
+            set("createPost", function() {});
+            set("update", function(elapsed:Float) {});
+            set("updatePost", function(elapsed:Float) {});
+            set("startCountdown", function() {});
+            set("onCountdownStarted", function() {});
+            set("onCountdownTick", function(tick:Int) {});
+            set("onUpdateScore", function(miss:Bool) {});
+            set("onNextDialogue", function(counter:Int) {});
+            set("onSkipDialogue", function() {});
+            set("onSongStart", function() {});
+            set("eventEarlyTrigger", function(eventName:String) {});
+            set("onResume", function() {});
+            set("onPause", function() {});
+            set("onSpawnNote", function(note:Note) {});
+            set("onGameOver", function() {});
+            set("onEvent", function(name:String, val1:Dynamic, val2:Dynamic) {});
+            set("onMoveCamera", function(char:String) {});
+            set("onEndSong", function() {});
+            set("onGhostTap", function(key:Int) {});
+            set("onKeyPress", function(key:Int) {});
+            set("onKeyRelease", function(key:Int) {});
+            set("noteMiss", function(note:Note) {});
+            set("noteMissPress", function(direction:Int) {});
+            set("opponentNoteHit", function(note:Note) {});
+            set("goodNoteHit", function(note:Note) {});
+            set("noteHit", function(note:Note) {});
+            set("stepHit", function() {});
+            set("beatHit", function() {});
+            set("sectionHit", function() {});
+            set("onRecalculateRating", function() {});
+            set("Function_Stop", FunkinLua.Function_Stop);
+            set("Function_StopScript", FunkinLua.Function_StopLua);
+            set("Function_StopLua", FunkinLua.Function_StopLua); // just in case
+            set("onIconUpdate", function(p:String) {});
+            set("onHeadBop", function(name:String) {});
+            set("onGameOverStart", function() {});
+            set("onGameOverConfirm", function() {});
+            set("onPauseMenuSelect", function(name:String) {});
+            set("onOpenPauseMenu", function() {});
+            set("onChangeCharacter", function(name:String, charObject:Character) {});
+            set("Std", Std);
+            set("WinAPI", WinAPI);
+            set("script", this);
+            set("destroy", function() {});
+            set("Note", Note);
+            set("trace", traace);
+            set("X", flixel.util.FlxAxes.X);
+            set("Y", flixel.util.FlxAxes.Y);
+            set("XY", flixel.util.FlxAxes.XY);
+            set("switchState", MusicBeatState.switchState);
+            set("ModdedState", ModdedState);
+            set("ModdedSubState", ModdedSubState);
+            set("FlxAxes", MacroTools.getMapFromAbstract(flixel.util.FlxAxes));
+            set("FlxColor", MacroTools.getMapFromAbstract(flixel.util.FlxColor));
+            set("FlxKey", MacroTools.getMapFromAbstract(flixel.input.keyboard.FlxKey));
+            set("FlxPoint", MacroTools.getMapFromAbstract(flixel.math.FlxPoint));
+            if (primer != null) primer(this);
 
             if (ttr != null) try {
                 interp.execute(getExprFromString(ttr, true));
@@ -216,25 +226,13 @@ class FunkinHX implements IFlxDestroyable {
             } catch (e:Dynamic) traace('$e');
     }
 
-    public function doFile(?file:String, ?type:FunkinHXType) {
-        if (file == null) file = scriptName;
-        if (type == null) type = scriptType;
-        var thing:String = file;
-        if (type == FILE) thing = sys.io.File.getContent(file);
-        try {
-            interp.execute(getExprFromString(thing, true));
-            trace("haxe file loaded successfully: " + file);
-            loaded = true;
-        } catch (e:Dynamic) traace('$e');
-    }
-
 
     public static function getExprFromString(code:String, critical:Bool = false, ?path:String):Expr
         {
             if (code == null)
                 return null;
             var parser = new hscript.Parser();
-            parser.allowTypes = true;
+            parser.allowTypes = parser.allowMetadata = true;
             var ast:Expr = null;
             try
             {
@@ -263,23 +261,14 @@ class FunkinHX implements IFlxDestroyable {
             return ast;
         }
 
-        public function runFunc(f:String, ?args:Array<Dynamic>):Any {
+        public function runFunc(f:String, args:Array<Dynamic> = null):Any {
             if (!loaded) return null;
             try {
-                if (interp.variables.exists(f)) {
-                    if (Reflect.isFunction(interp.variables[f])) {
-                        var f = interp.variables[f];
-                        if (args.length < 1) return f();
-                        else return Reflect.callMethod(null, f, args);
-                    }
-                    trace('$f exists, but is not a function!');
-                    return null;
-                }
+                return interp.callMethod(f, args);
             } catch (e:Dynamic) {
                 if (!ignoreErrors) openfl.Lib.application.window.alert('Error with script: ' + scriptName + ' at line ' + interp.posInfos().lineNumber + ":\n" + e, 'Haxe script error');
                 return null;
             }
-            trace('$f does not exist!');
             return null;
         }
 

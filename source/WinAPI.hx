@@ -1,3 +1,6 @@
+#if cpp
+import cpp.ConstCharStar;
+#end
 #if windows
 @:buildXml('
 <target id="haxe">
@@ -31,5 +34,13 @@ class WinAPI {
     #end
     public static function setTransColor(red:Int, green:Int, blue:Int, alpha:Int = 0) {
         return alpha;
+    }
+    // from indie cross \/ \/ \/
+    public static function messageBoxYN(#if cpp msg:ConstCharStar = null, title:ConstCharStar = null #else msg:String = null, title:String = null #end):Bool {
+        #if windows
+        var msgBox:Int = untyped MessageBox(null, msg, title, untyped __cpp__("MB_ICONQUESTION | MB_YESNO"));
+        return msgBox == 6;
+        #end
+        return true;
     }
 }

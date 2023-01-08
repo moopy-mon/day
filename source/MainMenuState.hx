@@ -33,20 +33,12 @@ typedef MenuJSONData = {
 	showChecker:Bool,
 	showVersionText:Bool,
 	overrideVersionText:Bool,
-	customVersionText:String,
-	items:Null<Array<MenuItemData>>
+	customVersionText:String
 }
-
-typedef MenuItemData = {
-	name:String,
-	stateToOpen:String,
-	stateIsScripted:Bool
-}
-
-class MainMenuState extends MusicBeatState
+class MainMenuState extends lore.ScriptableState
 {
-	var menuJson:MenuJSONData;
-	public static inline final loreEngineVersion:String = '0.7.0';
+	var menuJson:MenuJSONData = Json.parse(Paths.getTextFromFile("data/menu.json"));
+	public static inline final loreEngineVersion:String = MacroTools.getEngineVersion();
 	public static inline final versionSuffix:String = ''; // just so i can add a suffix without breaking any version checks
 	public static inline final isNotFinal:Bool = false;
 	public static inline final psychEngineVersion:String = '0.6.3'; // to maximize compatibility
@@ -60,27 +52,28 @@ class MainMenuState extends MusicBeatState
 	var menuItems:FlxTypedGroup<FlxSprite>;
 	private var camGame:FlxCamera;
 	private var camAchievement:FlxCamera;
-	var optionShit:Array<String> = [];
-
-	var stateInfo:Map<String, Array<Dynamic>> = [];
+	var optionShit:Array<String> = [
+		'story_mode',
+		'freeplay',
+		#if MODS_ALLOWED 'mods', #end
+		#if ACHIEVEMENTS_ALLOWED 'awards', #end
+		'credits',
+		#if !switch 'donate', #end
+		'options'
+	];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
 	var debugKeys:Array<FlxKey>;
-	override function beatHit() // for later use
-	{
-		super.beatHit();
+	override public function new() {
+		super((script:lore.FunkinHX) -> {
+			script.set("onOptionSelected", function(name:String) {});
+			script.set("addOption", addOption);
+		});
 	}
 	override function create()
 	{
-		menuJson = Json.parse(Paths.getTextFromFile("data/menu.json"));
-		if (menuJson.items != null) {
-			optionShit = [for (item in menuJson.items) item.name];
-			for (i in 0...optionShit.length) {
-				stateInfo.set(optionShit[i], [menuJson.items[i].stateToOpen, menuJson.items[i].stateIsScripted]);
-			}
-		}
 		#if (flixel_addons >= "3.0.0")
 		checker.scrollFactor.set(0.2, 0.2);
 		#end
@@ -107,6 +100,7 @@ class MainMenuState extends MusicBeatState
 		transOut = FlxTransitionableState.defaultTransOut;
 
 		persistentUpdate = persistentDraw = true;
+		super.create();
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
 		var bg:FlxSprite = new FlxSprite(-80);
@@ -169,7 +163,9 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, (ClientPrefs.showLore ? "Lore Engine v" + (loreEngineVersion.endsWith(".0") ? loreEngineVersion.replace(".0", "") + versionSuffix + " \\ " : loreEngineVersion + versionSuffix + " \\ ") : "") + "Friday Night Funkin' v" + Application.current.meta.get('version')#if debug + " (debug)"#end, 12);
+		var verText = (ClientPrefs.showLore ? "Lore Engine v" + (loreEngineVersion.endsWith(".0") ? loreEngineVersion.replace(".0", "") + versionSuffix + " \\ " : loreEngineVersion + versionSuffix + " \\ ") : "") + "Friday Night Funkin' v" + Application.current.meta.get('version')#if debug + " (debug)"#end;
+		if (isNotFinal && commitHash != "") verText += ' (not final, commit hash ${commitHash.substr(0, 6)})';
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, verText, 12);
 		versionShit.scrollFactor.set();
 		if (menuJson.overrideVersionText && menuJson.customVersionText != "") versionShit.text = menuJson.customVersionText;
 		versionShit.screenCenter(X);
@@ -192,8 +188,7 @@ class MainMenuState extends MusicBeatState
 			}
 		}
 		#end
-
-		super.create();
+		super.createPost();
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
@@ -209,6 +204,7 @@ class MainMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		super.update(elapsed);
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -268,20 +264,25 @@ class MainMenuState extends MusicBeatState
 						{
 							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 							{
+								if (script != null) script.runFunc("onOptionSelected", [optionShit[curSelected]]);
 								var daChoice:String = optionShit[curSelected];
 
-								if (!stateInfo[daChoice][1]) {
-									var state:flixel.FlxState = Type.createInstance(Type.resolveClass(stateInfo[optionShit[curSelected]][0]), []);
-									state = switch(stateInfo[optionShit[curSelected]][0]) {
-										case "mods": new ModsMenuState();
-										case "awards": new AchievementsMenuState();
-										case "credits": new CreditsState();
-										case "options": new options.OptionsState();
-										case _: state;
-									}
-									MusicBeatState.switchState(state);
-								} else {
-									MusicBeatState.switchState(new lore.ScriptedState(stateInfo[optionShit[curSelected]][0]));
+								switch (daChoice)
+								{
+									case 'story_mode':
+										MusicBeatState.switchState(new StoryMenuState());
+									case 'freeplay':
+										MusicBeatState.switchState(new FreeplayState());
+									#if MODS_ALLOWED
+									case 'mods':
+										MusicBeatState.switchState(new ModsMenuState());
+									#end
+									case 'awards':
+										MusicBeatState.switchState(new AchievementsMenuState());
+									case 'credits':
+										MusicBeatState.switchState(new CreditsState());
+									case 'options':
+										MusicBeatState.switchState(new options.OptionsState());
 								}
 							});
 						}
@@ -297,14 +298,11 @@ class MainMenuState extends MusicBeatState
 			}
 			#end
 			#end
+			super.updatePost(elapsed);
 		}
-
-		super.update(elapsed);
-
-		menuItems.forEach(function(spr:FlxSprite)
-		{
-			if (menuJson.menuItemX == "center") spr.screenCenter(X) else spr.x = Std.int(menuJson.menuItemX);
-		});
+	}
+	public function addOption(name:String) {
+		optionShit.push(name);
 	}
 
 	function changeItem(huh:Int = 0)

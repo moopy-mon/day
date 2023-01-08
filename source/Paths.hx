@@ -36,6 +36,9 @@ class Paths
 		'sounds',
 		'shaders',
 		'locale',
+		'states',
+		'substates',
+		'extendable',
 		'videos',
 		'images',
 		'stages',
@@ -410,7 +413,7 @@ class Paths
 
 	#if MODS_ALLOWED
 	inline static public function mods(key:String = '') {
-		return 'mods/' + key;
+		return #if mac '././' + #end 'mods/' + key;
 	}
 
 	inline static public function modsFont(key:String) {
@@ -485,7 +488,7 @@ class Paths
 	static public function pushGlobalMods() // prob a better way to do this but idc
 	{
 		globalMods = [];
-		var path:String = 'modsList.txt';
+		var path:String = #if mac '././' + #end 'modsList.txt';
 		if(FileSystem.exists(path))
 		{
 			var list:Array<String> = CoolUtil.coolTextFile(path);

@@ -1,16 +1,18 @@
 package;
 
-import shadertoy.FlxShaderToyRuntimeShader;
-import flixel.group.FlxGroup;
-import flixel.math.FlxRandom;
-import flixel.graphics.FlxGraphic;
-import flixel.input.mouse.FlxMouse;
-#if desktop
-import Discord.DiscordClient;
-#end
+import Achievements;
+import Conductor.Rating;
+import DialogueBoxPsych;
+import FunkinLua;
+import Note.EventNote;
 import Section.SwagSection;
+import Shaders;
 import Song.SwagSong;
+import StageData;
 import WiggleEffect.WiggleEffectType;
+import animateatlas.AtlasFrameMaker;
+import editors.CharacterEditorState;
+import editors.ChartingState;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -25,11 +27,20 @@ import flixel.addons.effects.FlxTrailArea;
 import flixel.addons.effects.chainable.FlxEffectSprite;
 import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.animation.FlxAnimationController;
+import flixel.effects.particles.FlxEmitter;
+import flixel.effects.particles.FlxParticle;
+import flixel.graphics.FlxGraphic;
 import flixel.graphics.atlas.FlxAtlas;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.group.FlxGroup;
+import flixel.group.FlxSpriteGroup;
+import flixel.input.keyboard.FlxKey;
+import flixel.input.mouse.FlxMouse;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
+import flixel.math.FlxRandom;
 import flixel.math.FlxRect;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
@@ -38,6 +49,7 @@ import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
+import flixel.util.FlxSave;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
@@ -46,26 +58,15 @@ import lime.utils.Assets;
 import openfl.Lib;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
+import openfl.events.KeyboardEvent;
 import openfl.filters.BitmapFilter;
 import openfl.utils.Assets as OpenFlAssets;
-import editors.ChartingState;
-import editors.CharacterEditorState;
-import flixel.group.FlxSpriteGroup;
-import flixel.input.keyboard.FlxKey;
-import Note.EventNote;
-import openfl.events.KeyboardEvent;
-import flixel.effects.particles.FlxEmitter;
-import flixel.effects.particles.FlxParticle;
-import flixel.util.FlxSave;
-import flixel.animation.FlxAnimationController;
-import animateatlas.AtlasFrameMaker;
-import Achievements;
-import StageData;
-import FunkinLua;
-import DialogueBoxPsych;
-import Shaders;
-import Conductor.Rating;
+import shadertoy.FlxShaderToyRuntimeShader;
 
+using StringTools;
+#if desktop
+import Discord.DiscordClient;
+#end
 #if !flash 
 import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
@@ -82,15 +83,26 @@ import js.html.FileSystem;
 import vlc.MP4Handler;
 #end
 
-using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	public var clearCache:Bool = true;
+	override public function new(clearCache:Bool = true) {
+		super();
+		this.clearCache = clearCache;
+	}
 	public static var STRUM_X = 42;
 	public var topTimeSignature:Int = 4;
 	public var updateUnderlay:Bool = false;
 	public static var STRUM_X_MIDDLESCROLL = -278;
 	public var laneunderlay:FlxSprite;
+	public var ratingColors:Map<String, Int> = [
+		"shit" => FlxColor.RED,
+		"bad" => FlxColor.RED,
+		"good" => FlxColor.GREEN,
+		"sick" => FlxColor.CYAN,
+		"marv" => FlxColor.YELLOW
+	];
 	public static var ratingStuff:Array<Dynamic> = [
 		['Uninstall.', 0.46], // 0 to 45
 		['F', 0.51], // 45 to F50
@@ -153,6 +165,7 @@ class PlayState extends MusicBeatState
 	public static var storyWeek:Int = 0;
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
+	public static var inPlayState:Bool = false;
 
 	public var spawnTime:Float = 2000;
 
@@ -190,7 +203,7 @@ class PlayState extends MusicBeatState
 	public var combo:Int = 0;
 
 	private var healthBarBG:AttachedSprite;
-	public var healthBar:FlxBar;
+	public var healthBar:lore.SmoothBar;
 	var songPercent:Float = 0;
 
 	private var timeBarBG:AttachedSprite;
@@ -341,7 +354,7 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		if (ClientPrefs.ratingPosition == "HUD") tempRatingScale = ClientPrefs.ratingScale;
-		if (!ClientPrefs.persistentCaching) {
+		if (!ClientPrefs.persistentCaching && clearCache) {
 			Paths.clearStoredMemory();
 			Paths.clearUnusedMemory();
 		}
@@ -931,7 +944,7 @@ class PlayState extends MusicBeatState
 						filesPushed.push(file);
 					}
 
-					if(file.endsWith('.hx') && !filesPushed.contains(file))
+					if((file.endsWith('.hx') || file.endsWith('.hxs')) && !filesPushed.contains(file))
 						{
 							haxeArray.push(new lore.FunkinHX(folder + file));
 							filesPushed.push(file);
@@ -964,6 +977,20 @@ class PlayState extends MusicBeatState
 		#if (MODS_ALLOWED && hscript)
 		doPush = false;
 		var hxFile:String = 'stages/' + curStage + '.hx';
+		if(FileSystem.exists(Paths.modFolders(hxFile))) {
+			hxFile = Paths.modFolders(hxFile);
+			doPush = true;
+		} else {
+			hxFile = Paths.getPreloadPath(hxFile);
+			if(FileSystem.exists(hxFile)) {
+				doPush = true;
+			}
+		}
+
+		if(doPush)
+			haxeArray.push(new lore.FunkinHX(hxFile));
+		doPush = false;
+		var hxFile:String = 'stages/' + curStage + '.hxs';
 		if(FileSystem.exists(Paths.modFolders(hxFile))) {
 			hxFile = Paths.modFolders(hxFile);
 			doPush = true;
@@ -1102,7 +1129,7 @@ class PlayState extends MusicBeatState
 		add(laneunderlay);
 
 		var showTime:Bool = (ClientPrefs.timeBarType != 'Disabled');
-		timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 248, 19, 400, "", 32);
+		timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 298, 19, 500, "", 32);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
@@ -1117,7 +1144,7 @@ class PlayState extends MusicBeatState
 		updateTime = showTime;
 
 		timeBarBG = new AttachedSprite('timeBar');
-		timeBarBG.x = timeTxt.x;
+		timeBarBG.x = timeTxt.x + 50;
 		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
 		timeBarBG.scrollFactor.set();
 		timeBarBG.alpha = 0;
@@ -1130,7 +1157,7 @@ class PlayState extends MusicBeatState
 			'songPercent', 0, 1);
 		timeBar.scrollFactor.set();
 		timeBar.createFilledBar(0xFF000000, 0xFFFFFFFF);
-		timeBar.numDivisions = 800; //How much lag this causes?? Should i tone it down to idk, 400 or 200?
+		timeBar.numDivisions = 1600; //How much lag this causes?? Should i tone it down to idk, 400 or 200?
 		timeBar.alpha = 0;
 		timeBar.visible = showTime;
 		timeBarBG.sprTracker = timeBar;
@@ -1231,6 +1258,27 @@ class PlayState extends MusicBeatState
 				haxeArray.push(new lore.FunkinHX(hscriptToLoad));
 			}
 			#end
+			#if MODS_ALLOWED
+			var hscriptToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.hxs');
+			if(FileSystem.exists(hscriptToLoad))
+			{
+				haxeArray.push(new lore.FunkinHX(hscriptToLoad));
+			}
+			else
+			{
+				hscriptToLoad = Paths.getPreloadPath('custom_notetypes/' + notetype + '.hxs');
+				if(FileSystem.exists(hscriptToLoad))
+				{
+					haxeArray.push(new lore.FunkinHX(hscriptToLoad));
+				}
+			}
+			#elseif sys
+			var hscriptToLoad:String = Paths.getPreloadPath('custom_notetypes/' + notetype + '.hxs');
+			if(OpenFlAssets.exists(hscriptToLoad))
+			{
+				haxeArray.push(new lore.FunkinHX(hscriptToLoad));
+			}
+			#end
 		}
 		for (event in eventPushedMap.keys())
 		{
@@ -1250,6 +1298,27 @@ class PlayState extends MusicBeatState
 			}
 			#elseif sys
 			var hscriptToLoad:String = Paths.getPreloadPath('custom_events/' + event + '.hx');
+			if(OpenFlAssets.exists(hscriptToLoad))
+			{
+				haxeArray.push(new lore.FunkinHX(hscriptToLoad));
+			}
+			#end
+			#if MODS_ALLOWED
+			var hscriptToLoad:String = Paths.modFolders('custom_events/' + event + '.hxs');
+			if(FileSystem.exists(hscriptToLoad))
+			{
+				haxeArray.push(new lore.FunkinHX(hscriptToLoad));
+			}
+			else
+			{
+				hscriptToLoad = Paths.getPreloadPath('custom_events/' + event + '.hxs');
+				if(FileSystem.exists(hscriptToLoad))
+				{
+					haxeArray.push(new lore.FunkinHX(hscriptToLoad));
+				}
+			}
+			#elseif sys
+			var hscriptToLoad:String = Paths.getPreloadPath('custom_events/' + event + '.hxs');
 			if(OpenFlAssets.exists(hscriptToLoad))
 			{
 				haxeArray.push(new lore.FunkinHX(hscriptToLoad));
@@ -1301,9 +1370,10 @@ class PlayState extends MusicBeatState
 		add(healthBarBG);
 		if(ClientPrefs.downScroll) healthBarBG.y = 0.11 * FlxG.height;
 
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
+		healthBar = new lore.SmoothBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
 		healthBar.scrollFactor.set();
+		healthBar.numDivisions = 1000;
 		// healthBar
 		healthBar.visible = !ClientPrefs.hideHud;
 		healthBar.alpha = ClientPrefs.healthBarAlpha;
@@ -1377,7 +1447,7 @@ class PlayState extends MusicBeatState
 						luaArray.push(new FunkinLua(folder + file));
 						filesPushed.push(file);
 					}
-					if(file.endsWith('.hx') && !filesPushed.contains(file))
+					if((file.endsWith('.hx') || file.endsWith('.hxs')) && !filesPushed.contains(file))
 						{
 							haxeArray.push(new lore.FunkinHX(folder + file));
 							filesPushed.push(file);
@@ -1492,6 +1562,26 @@ class PlayState extends MusicBeatState
 
 
 		Conductor.safeZoneOffset = (ClientPrefs.safeFrames / 60) * 1000;
+		#if hscript
+		for (i in haxeArray) {
+			i.set("boyfriend", boyfriend);
+			i.set("dad", dad);
+			i.set("gf", gf);
+			i.set("iconP1", iconP1);
+			i.set("iconP2", iconP2);
+			i.set("healthBarBG", healthBarBG);
+			i.set("healthBar", healthBar);
+			i.set("scoreTxt", scoreTxt);
+			i.set("timeTxt", timeTxt);
+			i.set("timeBarBG", timeBarBG);
+			i.set("timeBar", timeBar);
+			i.set("playerStrums", playerStrums);
+			i.set("opponentStrums", opponentStrums);
+			i.set("strumLineNotes", strumLineNotes);
+			i.set("strumLine", strumLine);
+			i.set("notes", notes);
+		}
+		#end
 		callOnLuas('onCreatePost', []);
 		callOnHaxes('createPost', []);
 
@@ -1724,6 +1814,35 @@ class PlayState extends MusicBeatState
 		#if hscript
 		var doPush:Bool = false;
 		var hscriptFile:String = 'characters/' + name + '.hx';
+		#if MODS_ALLOWED
+		if(FileSystem.exists(Paths.modFolders(hscriptFile))) {
+			hscriptFile = Paths.modFolders(hscriptFile);
+			doPush = true;
+		} else {
+			hscriptFile = Paths.getPreloadPath(hscriptFile);
+			if(FileSystem.exists(hscriptFile)) {
+				doPush = true;
+			}
+		}
+		#else
+		hscriptFile = Paths.getPreloadPath(hscriptFile);
+		if(Assets.exists(hscriptFile)) {
+			doPush = true;
+		}
+		#end
+
+		if(doPush)
+		{
+			for (script in haxeArray)
+			{
+				if(script.scriptName == hscriptFile) return;
+			}
+			haxeArray.push(new lore.FunkinHX(hscriptFile));
+		}
+		#end
+		#if hscript
+		var doPush:Bool = false;
+		var hscriptFile:String = 'characters/' + name + '.hxs';
 		#if MODS_ALLOWED
 		if(FileSystem.exists(Paths.modFolders(hscriptFile))) {
 			hscriptFile = Paths.modFolders(hscriptFile);
@@ -2610,7 +2729,10 @@ class PlayState extends MusicBeatState
 			iconP2.bopIcon(ClientPrefs.bopStyle == "LORE", "dad");
 		}
 		if (camZooming) {
-			FlxG.camera.zoom += (0.015 / defaultCamZoom) * camZoomingMult;
+			var thing:Float;
+			if (defaultCamZoom <= 1) thing = (0.015 * defaultCamZoom);
+			else thing = (0.015 / defaultCamZoom); 
+			FlxG.camera.zoom += thing * camZoomingMult;
 			camHUD.zoom += 0.03 * camZoomingMult;
 		}
 
@@ -3336,8 +3458,9 @@ class PlayState extends MusicBeatState
 
 		var iconOffset:Int = 26;
 
-		iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
-		iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
+		// old: FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)
+		iconP1.x = healthBar.x + (healthBar.width * (1 - (@:privateAccess healthBar._lerpValue / 2))) + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
+		iconP2.x = healthBar.x + (healthBar.width * (1 - (@:privateAccess healthBar._lerpValue / 2))) - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
 
 		if (health > 2)
 			health = 2;
@@ -4031,6 +4154,9 @@ class PlayState extends MusicBeatState
 							var lastAlpha:Float = boyfriend.alpha;
 							boyfriend.alpha = 0.00001;
 							boyfriend = boyfriendMap.get(value2);
+							setOnHaxes('boyfriend', boyfriend);
+							callOnLuas("onChangeCharacter", ["bf"]);
+							callOnHaxes("onChangeCharacter", ["bf"]);
 							boyfriend.alpha = lastAlpha;
 							iconP1.changeIcon(boyfriend.healthIcon, boyfriend.hasVictory);
 						}
@@ -4046,6 +4172,9 @@ class PlayState extends MusicBeatState
 							var lastAlpha:Float = dad.alpha;
 							dad.alpha = 0.00001;
 							dad = dadMap.get(value2);
+							setOnHaxes('dad', dad);
+							callOnLuas("onChangeCharacter", ["dad"]);
+							callOnHaxes("onChangeCharacter", ["dad"]);
 							if(!dad.curCharacter.startsWith('gf')) {
 								if(wasGf && gf != null) {
 									gf.visible = true;
@@ -4071,6 +4200,9 @@ class PlayState extends MusicBeatState
 								var lastAlpha:Float = gf.alpha;
 								gf.alpha = 0.00001;
 								gf = gfMap.get(value2);
+								setOnHaxes('gf', gf);
+								callOnLuas("onChangeCharacter", ["gf"]);
+								callOnHaxes("onChangeCharacter", ["gf"]);
 								gf.alpha = lastAlpha;
 							}
 							setOnLuas('gfName', gf.curCharacter);
@@ -4257,9 +4389,6 @@ class PlayState extends MusicBeatState
 		#end
 
 
-		#if LUA_ALLOWED
-		callOnLuas('changeDiscordClientID', ["936072337219026954"]);
-		#end
 		
 		var ret:Array<Dynamic> = [callOnLuas('onEndSong', [], false), callOnHaxes('onEndSong', [], false)];
 		if(!ret.contains(FunkinLua.Function_Stop) && !transitioning) {
@@ -4529,16 +4658,9 @@ class PlayState extends MusicBeatState
 		noteDiffText.updateHitbox();
 		if (ClientPrefs.ratingPosition == "HUD") noteDiffText.cameras = [camHUD];
 		noteDiffText.borderSize = 1.25;
-		switch(daRating.name) {
-			case "shit" | "bad":
-				noteDiffText.color = FlxColor.RED;
-			case "good":
-				noteDiffText.color = FlxColor.GREEN;
-			case "sick":
-				noteDiffText.color = FlxColor.CYAN;
-			case "marv":
-				noteDiffText.color = FlxColor.YELLOW;
-		}
+		if (ratingColors.get(daRating.name) != null)
+			noteDiffText.color = ratingColors.get(daRating.name);
+		else noteDiffText.color = FlxColor.WHITE;
 		noteDiffText.y = noteDiffText.y - 10;
 		var nty = noteDiffText.y + 10;
 		if (noteDiffTween != null) noteDiffTween.cancel();
@@ -5355,6 +5477,7 @@ class PlayState extends MusicBeatState
 	}
 
 	override function destroy() {
+		Discord.DiscordClient.changeClientID("936072337219026954");
 		for (lua in luaArray) {
 			lua.call('onDestroy', []);
 			lua.stop();
@@ -5584,6 +5707,7 @@ class PlayState extends MusicBeatState
 
 	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops = true, exclusions:Array<String> = null):Dynamic {
 		var returnVal:Dynamic = FunkinLua.Function_Continue;
+		var returnArray:Array<Dynamic> = [];
 		#if LUA_ALLOWED
 		if(exclusions == null) exclusions = [];
 		for (script in luaArray) {
@@ -5599,14 +5723,17 @@ class PlayState extends MusicBeatState
 			if(!bool && ret != 0) {
 				returnVal = cast ret;
 			}
+			returnArray.push(returnVal);
 		}
 		#end
 		//trace(event, returnVal);
+		if (returnArray.contains(FunkinLua.Function_Stop)) return FunkinLua.Function_Stop;
 		return returnVal;
 	}
 
 	public function callOnHaxes(event:String, args:Array<Dynamic>, ignoreStops = true, exclusions:Array<String> = null):Dynamic {
 		var returnVal:Dynamic = FunkinLua.Function_Continue;
+		var returnArray:Array<Dynamic> = [];
 		#if hscript
 		if(exclusions == null) exclusions = [];
 		for (script in haxeArray) {
@@ -5622,9 +5749,11 @@ class PlayState extends MusicBeatState
 			if(!bool) {
 				returnVal = cast ret;
 			}
+			returnArray.push(returnVal);
 		}
 		#end
 		//trace(event, returnVal);
+		if (returnArray.contains(FunkinLua.Function_Stop)) return FunkinLua.Function_Stop;
 		return returnVal;
 	}
 
@@ -5641,7 +5770,7 @@ class PlayState extends MusicBeatState
 	public function setOnHaxes(variable:String, arg:Dynamic) {
 		#if hscript
 		for (i in haxeArray) {
-			i.setInterpVariable(variable, arg);
+			i.set(variable, arg);
 		}
 		#end
 	}

@@ -294,7 +294,7 @@ class ChartingState extends MusicBeatState
 		if(curSec >= _song.notes.length) curSec = _song.notes.length - 1;
 
 		FlxG.mouse.visible = true;
-		//FlxG.save.bind('funkin', 'ninjamuffin99');
+		//FlxG.save.bind('funkin' #if (flixel < "5.0.0"), 'ninjamuffin99' #end);
 
 		tempBpm = _song.bpm;
 
@@ -1726,6 +1726,8 @@ class ChartingState extends MusicBeatState
 			{
 				autosaveSong();
 				FlxG.mouse.visible = false;
+				var thing = true;
+				if (PlayState.SONG == _song) thing = false;
 				PlayState.SONG = _song;
 				FlxG.sound.music.stop();
 				if(vocals != null) vocals.stop();
@@ -1733,7 +1735,7 @@ class ChartingState extends MusicBeatState
 
 				//if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
 				StageData.loadDirectory(_song);
-				LoadingState.loadAndSwitchState(new PlayState());
+				LoadingState.loadAndSwitchState(new PlayState(thing));
 			}
 
 			if(curSelectedNote != null && curSelectedNote[1] > -1) {
