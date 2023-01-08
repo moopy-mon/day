@@ -1,4 +1,5 @@
-import("Math"); 
+import Math; 
+
 var bg:FlxSprite;
 var shader;
 
