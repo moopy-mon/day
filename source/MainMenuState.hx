@@ -37,12 +37,13 @@ typedef MenuJSONData = {
 }
 class MainMenuState extends lore.ScriptableState
 {
+	public static final commitHash = MacroTools.getGitCommitHash();
 	var menuJson:MenuJSONData = Json.parse(Paths.getTextFromFile("data/menu.json"));
-	public static inline final loreEngineVersion:String = MacroTools.getEngineVersion();
-	public static inline final versionSuffix:String = ''; // just so i can add a suffix without breaking any version checks
-	public static inline final isNotFinal:Bool = false;
-	public static inline final psychEngineVersion:String = '0.6.3'; // to maximize compatibility
-	public static inline final moopVer:String = '1.0.0';
+	public static final loreEngineVersion:String = MacroTools.getEngineVersion();
+	public static final versionSuffix:String = ''; // just so i can add a suffix without breaking any version checks
+	public static final isNotFinal:Bool = false;
+	public static final psychEngineVersion:String = '0.6.3'; // to maximize compatibility
+	public static final moopVer:String = '1.0.0';
 	public static var curSelected:Int = 0;
 	#if (flixel_addons < "3.0.0")
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Free_Checker'), 0.2, 0.2, true, true);
