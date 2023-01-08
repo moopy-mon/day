@@ -1,0 +1,33 @@
+import flixel.addons.effects.FlxTrail;
+
+var dadTrail:FlxTrail;
+var overScreen:FlxSprite;
+function createPost() {
+    dadTrail = new FlxTrail(dad, null, 15, 5, 0.4, 0.0267);
+    dadTrail.visible = false;
+    addBehindDad(dadTrail);
+    overScreen = new FlxSprite(-1000, -1000).makeGraphic(4000, 4000, 0xff000000);
+    overScreen.alpha = 0;
+    add(overScreen);
+}
+
+var zooming:Bool = false;
+
+function beatHit() {
+    if (curBeat == 320) {
+        zooming = true;
+        game.defaultCamZoom += 0.2;
+        dadTrail.visible = true; 
+        FlxTween.tween(overScreen, {alpha: 0.25}, 2 / game.playbackRate);
+    }
+    if (zooming && curBeat % 2 == 0) {
+        FlxG.camera.zoom += (0.015 * game.defaultCamZoom) * game.camZoomingMult;
+        game.camHUD.zoom += 0.03 * game.camZoomingMult;
+    }
+    if (curBeat == 448) {
+        zooming = false;
+        game.defaultCamZoom -= 0.2;
+        dadTrail.visible = false;
+        FlxTween.tween(overScreen, {alpha: 0}, 2 / game.playbackRate);
+    }
+}

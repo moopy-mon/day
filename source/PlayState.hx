@@ -1066,7 +1066,6 @@ class PlayState extends MusicBeatState
 		startCharacterPos(dad, true);
 		if (!ClientPrefs.optimization) { 
 			dadGroup.add(dad);
-			if (SONG.song.toLowerCase() == 'moopwave') addBehindDad(new flixel.addons.effects.FlxTrail(dad, null, 15, 5, 0.4, 0.0267));
 		}
 		startCharacterLua(dad.curCharacter);
 
