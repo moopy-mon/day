@@ -13,20 +13,35 @@ function createPost() {
 
 var zooming:Bool = false;
 
+var _currentCamZoom:Float = 1;
+var _currentHUDZoom:Float = 1;
 function beatHit() {
     if (curBeat == 320) {
+        _currentCamZoom = game.defaultCamZoom;
+        _currentHUDZoom = game.defaultHUDZoom;
         zooming = true;
         game.defaultCamZoom += 0.2;
+        game.defaultHUDZoom -= 0.05;
         dadTrail.visible = true; 
         FlxTween.tween(overScreen, {alpha: 0.25}, 2 / game.playbackRate);
     }
     if (zooming && curBeat % 2 == 0) {
-        FlxG.camera.zoom += (0.015 * game.defaultCamZoom) * game.camZoomingMult;
-        game.camHUD.zoom += 0.03 * game.camZoomingMult;
+        var thing:Float;
+        if (game.defaultCamZoom <= 1) thing = (0.015 * game.defaultCamZoom);
+        else thing = (0.015 / game.defaultCamZoom); 
+        FlxG.camera.zoom += thing * game.camZoomingMult;
+        if (game.defaultHUDZoom <= 1) thing = (0.03 * game.defaultHUDZoom);
+        else thing = (0.03 / game.defaultHUDZoom); 
+        game.camHUD.zoom += thing * game.camZoomingMult;
+    }
+    if ([416, 420, 424, 428, 432, 436, 430, 444].contains(curBeat)) {
+        game.defaultCamZoom += 0.05;
+        game.defaultHUDZoom -= 0.00625;
     }
     if (curBeat == 448) {
         zooming = false;
-        game.defaultCamZoom -= 0.2;
+        game.defaultCamZoom = _currentCamZoom;
+        game.defaultHUDZoom = _currentHUDZoom;
         dadTrail.visible = false;
         FlxTween.tween(overScreen, {alpha: 0}, 2 / game.playbackRate);
     }
