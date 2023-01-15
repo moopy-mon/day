@@ -54,6 +54,11 @@ class Main extends Sprite
 	#end
 	public function new()
 	{
+		hscript.Interp.deniedClasses = [
+			GJKeys,
+			GJToastManager,
+			Highscore
+		];
 		instance = this;
 		super();
 		@:privateAccess Lib.application.window.onResize.add((w, h) -> {

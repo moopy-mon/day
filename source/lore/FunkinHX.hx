@@ -31,7 +31,8 @@ class FunkinHX implements IFlxDestroyable {
         "Highscore",
         "Process",
         "Sys.command",
-        "Reflect"
+        "Reflect",
+        "Interp.deniedClasses"
     ];
     private var interp:Interp;
     public var scriptName:String = "unknown";
