@@ -91,7 +91,7 @@ class PlayState extends MusicBeatState
 		super();
 		this.clearCache = clearCache;
 	}
-	public static var STRUM_X = 42;
+	public static var STRUM_X = 48;
 	public var topTimeSignature:Int = 4;
 	public var updateUnderlay:Bool = false;
 	public static var STRUM_X_MIDDLESCROLL = -278;
@@ -1120,6 +1120,7 @@ class PlayState extends MusicBeatState
 
 		var showTime:Bool = (ClientPrefs.timeBarType != 'Disabled');
 		timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 298, 19, 500, "", 32);
+		timeTxt.screenCenter(X);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
@@ -1134,7 +1135,7 @@ class PlayState extends MusicBeatState
 		updateTime = showTime;
 
 		timeBarBG = new AttachedSprite('timeBar');
-		timeBarBG.x = timeTxt.x + 50;
+		timeBarBG.screenCenter(X);
 		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
 		timeBarBG.scrollFactor.set();
 		timeBarBG.alpha = 0;
@@ -1158,11 +1159,8 @@ class PlayState extends MusicBeatState
 		add(strumLineNotes);
 		add(grpNoteSplashes);
 
-		if(ClientPrefs.timeBarType == 'Song Name' || ClientPrefs.timeBarType.contains("and Time"))
-		{
-			timeTxt.size = 24;
-			timeTxt.y += 3;
-		}
+		timeTxt.size = 24;
+		timeTxt.y += 3;
 
 		var splash:NoteSplash = new NoteSplash(100, 100, 0);
 		grpNoteSplashes.add(splash);
@@ -1345,7 +1343,7 @@ class PlayState extends MusicBeatState
 		add(iconP2);
 		reloadHealthBarColors();
 
-		scoreTxt = new FlxText(0, healthBarBG.y + 26, FlxG.width, "", 20);
+		scoreTxt = new FlxText(0, healthBarBG.y + 30, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
@@ -3461,6 +3459,8 @@ class PlayState extends MusicBeatState
 
 					if (ClientPrefs.timeBarType.contains("and Time"))
 						timeTxt.text = SONG.song + " (" + FlxStringUtil.formatTime(secondsTotal / playbackRate, false) + ")";
+					else if (ClientPrefs.timeBarType == "Time Elapsed / Total")
+						timeTxt.text = FlxStringUtil.formatTime(secondsTotal / playbackRate, false) + " / " + FlxStringUtil.formatTime(songLength / 1000 / playbackRate, false);
 					else if(ClientPrefs.timeBarType != 'Song Name')
 						timeTxt.text = FlxStringUtil.formatTime(secondsTotal / playbackRate, false);
 				}
@@ -4640,7 +4640,7 @@ class PlayState extends MusicBeatState
 			lastRating = rating;
 			var scaleX = rating.scale.x;
 			var scaleY = rating.scale.y;
-			rating.scale.scale(1.2 * tempRatingScale);
+			rating.scale.add(.2 * scaleX, .2 * scaleY);
 			if(ratingTween!=null && ratingTween.active){
 				ratingTween.cancel();
 			}
@@ -4696,10 +4696,10 @@ class PlayState extends MusicBeatState
 
 			//if (combo >= 10 || combo == 0)
 				if (ClientPrefs.smJudges) numGroup.add(numScore) else add(numScore);
-			var oldy:Float = numScore.y;
 				if (ClientPrefs.smJudges) {
-					numScore.y -= (new FlxRandom().int(20,30) * tempRatingScale);
-					FlxTween.tween(numScore, {y: oldy}, 0.2, {ease:FlxEase.circOut});
+					var oldScale:Float = numScore.scale.x;
+					numScore.scale.set(1.4 * oldScale, 1.4 * oldScale);
+					FlxTween.tween(numScore.scale, {x: oldScale, y: oldScale}, 0.2, {ease:FlxEase.circOut});
 				}
 			FlxTween.tween(numScore, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
@@ -4790,11 +4790,6 @@ class PlayState extends MusicBeatState
 					}
 				}
 
-				// I dunno what you need this for but here you go
-				//									- Shubs
-
-				// Shubs, this is for the "Just the Two of Us" achievement lol
-				//									- Shadow Mario
 				keysPressed[key] = true;
 
 				//more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)

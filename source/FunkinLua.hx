@@ -2604,7 +2604,7 @@ class FunkinLua {
 			{
 				var save:FlxSave = new FlxSave();
 				// folder goes unused for flixel 5 users. @BeastlyGhost
-				save.bind(name #if (flixel < "5.0.0"), folder #end);
+				save.bind(name, CoolUtil.getSavePath(folder));
 				PlayState.instance.modchartSaves.set(name, save);
 				return;
 			}
@@ -2874,14 +2874,6 @@ class FunkinLua {
 		Lua_helper.add_callback(lua, "setIconFrames", function(icon:String, frameImage:String, spriteType:String = "sparrow") {
 			if (icon == "player") loadFrames(PlayState.instance.iconP1, frameImage, spriteType);
 			else if (icon == "opponent") loadFrames(PlayState.instance.iconP2, frameImage, spriteType);
-		});
-		Lua_helper.add_callback(lua, "setIconOffsets", function(char:String, x:Float, y:Float) {
-			if (char == "player") {
-				PlayState.instance.iconP1.offsets.set(x, y);
-			}
-			else if (char == "opponent") {
-				PlayState.instance.iconP2.offsets.set(x, y);
-			}
 		});
 		Lua_helper.add_callback(lua, "addIconAnimationByPrefix", function(char:String, name:String, prefix:String, framerate:Int = 24, loop:Bool = true) {
 			if (char == "player") {
